@@ -18,6 +18,8 @@
 #include <signal.h>
 #include <termios.h>
 #include <ncurses.h>
+#include <utmp.h>
+#include <pwd.h>
 #include <sys/times.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -46,14 +48,14 @@ typedef struct Process
 {
     uint32_t pid;              // PID
     char user_name[16];        // USER
-    int16_t priority;         // PR
-    int16_t nice;             // NI
+    int8_t priority;          // PR
+    int8_t nice;              // NI
     uint64_t virtual_memory;   // VIRT
     uint64_t physical_memeory; // RES
     uint64_t shared_memory;    // SHR
     char status;               // S
-    float cpu_utilization;     // %CPU
-    float memory_utilization;  // %MEM
+    double cpu_utilization;     // %CPU
+    double memory_utilization;  // %MEM
     char time[16];             // TIME+
     char command[30];          // COMMAND
 } process;
@@ -62,31 +64,33 @@ typedef struct Process
 uint16_t REFRESH_PERIOD = 3;
 uint32_t TARGET_PID = 0;
 struct winsize WINDOW_SIZE;
-uint32_t VIEW_POSITION = 0;
-uint64_t LAST_CPU_STATUS[8] = {0};
-uint64_t **LAST_CPU_UPTIME;
-uint32_t LAST_PROCESS_COUNT;
+uint32_t VIEW_ROW_POSITION = 0;
+bool g_option_p = true;
+bool g_option_c = false;
+bool g_option_i = false;
+header g_header;
+uint64_t g_last_cpu_status[8] = {0};
 uint64_t TOTAL_CPU_TIME = 0;
 uint64_t TOTAL_MEMORY_SIZE = 0;
 
 // Function prototype
-int parse_option(int argc, char *argv[]);
+void parse_option(int argc, char *argv[]);
 void print_help(void);
 void alarm_handler(int signo);
 void update(void);
-header *get_header(void);
-void get_current_time(header *h);
-void get_uptime(header *h);
-void get_user_count(header *h);
-void get_load_average(header *h);
-void get_tasks_status(header *h);
-void get_cpu_status(header *h);
-void get_memmory_status(header *h);
-void print_header(header *h);
-process *get_processes(header *h);
+void update_header(void);
+void get_current_time();
+void get_uptime();
+void get_user_count();
+void get_load_average();
+void get_tasks_status();
+void get_cpu_status();
+void get_memmory_status();
+void print_header();
+process *get_processes();
 void get_user_name(int uid, char *buffer);
 void get_time_format(uint64_t total_time, char *buffer);
-void print_processes(header *h, process *p);
-void sort_by_pid(process *p, uint32_t process_count);
-void sort_by_cpu(process *p, uint32_t process_count);
+void print_processes(process *p);
+void sort_by_pid(process *p);
+void sort_by_cpu(process *p);
 #endif // MYTOP_H
