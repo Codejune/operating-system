@@ -1,16 +1,15 @@
+/**
+ * @file mytop.c
+ * @author 김병준 (kbj9704@gmail.com)
+ * @brief mytop 명령어 기능 함수 구현
+ */
 #include "mytop.h"
-
-// Running option
-// Spacebar / Enter: 화면 갱신
-// k: kill 실행
-// r: 우선순위 변경
-// z: 변경되는 값과 변경되지 않은 값의 경계
 
 /**
  * @brief Main entry function 
  * @param argc Argument count
  * @param argv Argument verse
- * @return int Ok 0, Error -1
+ * @return int Ok 0, Error 1
  */
 int main(int argc, char *argv[])
 {

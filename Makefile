@@ -28,7 +28,7 @@ MYPS_OBJS = $(MYPS_SRCS:.c=.o)
 MYLSCPU_OBJS = $(MYLSCPU_SRCS:.c=.o)
 OBJS = $(MYTOP_OBJS) $(MYTOP_SRCS_OBJS) $(MYPS_OBJS)
 # Library file
-LIBS = 
+LIBS = -lncurses
 # Include path
 INC =
 
@@ -41,7 +41,7 @@ all : $(OBJS)
 	$(CC) -o $(MYPS) $(MYPS_OBJS) $(LIBS)
 	$(CC) -o $(MYLSCPU) $(MYLSCPU_OBJS) $(LIBS)
 $(MYTOP) : $(MYTOP_OBJS)
-	$(CC) -o $@ $^ $(LIBS) -lncurses
+	$(CC) -o $@ $^ $(LIBS)
 $(MYPS) : $(MYPS_OBJS)
 	$(CC) -o $@ $^ $(LIBS)
 $(MYLSCPU) : $(MYLSCPU_OBJS)

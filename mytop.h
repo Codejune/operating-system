@@ -1,7 +1,7 @@
 /**
  * @file mytop.h
  * @author 김병준 (kbj9704@gmail.com)
- * @brief 프로젝트 공통 헤더, 함수 및 매크로 정의
+ * @brief mytop 명령어 구현에 필요한 헤더, 함수 및 매크로 정의
  */
 #ifndef MYTOP_H
 #define MYTOP_H
