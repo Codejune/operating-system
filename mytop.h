@@ -30,6 +30,7 @@
 // Macro
 #define BUFFER_SIZE 256
 #define MAX_BUFFER_SIZE 1024
+#define HERTZ sysconf(_SC_CLK_TCK)
 
 // Struct
 typedef struct Header
@@ -69,9 +70,10 @@ bool g_option_p = true;
 bool g_option_c = false;
 bool g_option_i = false;
 header g_header;
+process *g_last_processes;
 uint64_t g_last_cpu_status[8] = {0};
-uint64_t TOTAL_CPU_TIME = 0;
-uint64_t TOTAL_MEMORY_SIZE = 0;
+uint64_t g_cpu_total_time = 0;
+uint64_t g_memory_total_size = 0;
 
 // Function prototype
 void parse_option(int argc, char *argv[]);
@@ -88,7 +90,7 @@ void get_cpu_status();
 void get_memmory_status();
 void print_header();
 process *get_processes();
-void get_user_name(int uid, char *buffer);
+void get_user_name(uint32_t uid, char *buffer);
 void get_time_format(uint64_t total_time, char *buffer);
 void print_processes(process *p);
 void sort_by_pid(process *p);

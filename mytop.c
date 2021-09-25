@@ -123,8 +123,8 @@ void update(void)
     new_processes = get_processes();
     print_processes(new_processes);
     printw("											\n");
-    // free(new_header);
-    // free(new_processes);
+    free(g_last_processes);
+    g_last_processes = new_processes;
 }
 
 /**
@@ -165,7 +165,7 @@ void get_uptime()
         fprintf(stderr, "fopen error for /proc/uptime\n");
         exit(1);
     }
-    fscanf(fp, "%f %*f", &g_header.uptime);
+    fscanf(fp, "%f", &g_header.uptime);
     fclose(fp);
 }
 
@@ -283,7 +283,7 @@ void get_cpu_status()
            &current_cpu_status[6],
            &current_cpu_status[7]);
 
-    TOTAL_CPU_TIME = 0;
+    g_cpu_total_time = 0;
     for (i = 0; i < 8; i++)
     {
         switch (i)
@@ -301,7 +301,7 @@ void get_cpu_status()
             g_header.cpu[i] = current_cpu_status[i] - g_last_cpu_status[i];
             break;
         }
-        TOTAL_CPU_TIME += g_header.cpu[i];
+        g_cpu_total_time += g_header.cpu[i];
     }
     memcpy(g_last_cpu_status, current_cpu_status, sizeof(current_cpu_status));
     fclose(fp);
@@ -329,7 +329,7 @@ void get_memmory_status()
         {
         case 0: // MemTotal
             g_header.physical_memory[0] = (double)size / 1024;
-            TOTAL_MEMORY_SIZE = size;
+            g_memory_total_size = size;
             break;
         case 1: // MemFree
             g_header.physical_memory[1] = (double)size / 1024;
@@ -390,14 +390,14 @@ void print_header()
     printw("%s\n", buffer);
     // 3 Line
     sprintf(buffer, "%%Cpu(s): %.1f us, %.1f sy, %.1f ni, %.1f id, %.1f wa, %.1f hi, %.1f si, %.1f st",
-            (double)g_header.cpu[0] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[1] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[2] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[3] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[4] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[5] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[6] / TOTAL_CPU_TIME * 100,
-            (double)g_header.cpu[7] / TOTAL_CPU_TIME * 100);
+            (double)g_header.cpu[0] / g_cpu_total_time * 100,
+            (double)g_header.cpu[1] / g_cpu_total_time * 100,
+            (double)g_header.cpu[2] / g_cpu_total_time * 100,
+            (double)g_header.cpu[3] / g_cpu_total_time * 100,
+            (double)g_header.cpu[4] / g_cpu_total_time * 100,
+            (double)g_header.cpu[5] / g_cpu_total_time * 100,
+            (double)g_header.cpu[6] / g_cpu_total_time * 100,
+            (double)g_header.cpu[7] / g_cpu_total_time * 100);
     buffer[WINDOW_SIZE.ws_col - 1] = '\0';
     printw("%s\n", buffer);
     // 4 Line
@@ -425,12 +425,12 @@ void print_header()
 process *get_processes()
 {
     uint32_t file_count, current_pid = 0, i, j;
-    double utime, stime, cutime, cstime, start_time, seconds, total_time;
+    double start_time;
     char file_name[MAX_BUFFER_SIZE] = {0}, buffer[BUFFER_SIZE] = {0};
     FILE *stat_fp, *status_fp;
     struct dirent **namelist;
     struct stat statbuf;
-    process *p = (process *)malloc(g_header.task[0] * sizeof(process));
+    process *p = (process *)calloc(g_header.task[0], sizeof(process));
 
     file_count = scandir("/proc", &namelist, NULL, alphasort);
     for (i = 0; i < file_count; i++)
@@ -460,7 +460,6 @@ process *get_processes()
          * seconds = uptime - (starttime / hertz)
          * cpu_usage = 100 * ((total_time / hertz) / seconds)
          */
-        start_time = utime = stime = cutime = cstime = seconds = 0;
         for (j = 0; j < 23; j++)
         {
             fscanf(stat_fp, "%[^ ]", buffer);
@@ -482,20 +481,12 @@ process *get_processes()
                 break;
             // utime
             case 13:
-                utime = atoll(buffer);
+                p[current_pid].cpu_utilization = atoll(buffer);
                 break;
             // TIME+, stime
             case 14:
-                stime = atoll(buffer);
-                get_time_format(utime + stime, p[current_pid].time);
-                break;
-            // cutime
-            case 15:
-                cutime = atoll(buffer);
-                break;
-            // cstime
-            case 16:
-                cstime = atoll(buffer);
+                p[current_pid].cpu_utilization += atoll(buffer);
+                get_time_format(p[current_pid].cpu_utilization, p[current_pid].time);
                 break;
             // PR
             case 17:
@@ -508,17 +499,10 @@ process *get_processes()
             // starttime
             case 21:
                 start_time = atoll(buffer);
+                p[current_pid].cpu_utilization = 100 * ((p[current_pid].cpu_utilization / HERTZ) / (g_header.uptime - (start_time / HERTZ)));
                 break;
             }
         }
-        // %CPU
-        total_time = utime + stime;
-        seconds = g_header.uptime - (start_time / sysconf(_SC_CLK_TCK));
-
-        if (total_time <= 0 || seconds <= 0)
-            p[current_pid].cpu_utilization = 0;
-        else
-            p[current_pid].cpu_utilization = 100 * ((total_time / sysconf(_SC_CLK_TCK)) / seconds);
 
         p[current_pid].virtual_memory = 0;
         p[current_pid].physical_memeory = 0;
@@ -555,7 +539,7 @@ process *get_processes()
             }
         }
         // %MEM
-        p[current_pid].memory_utilization = (float)p[current_pid].physical_memeory / TOTAL_MEMORY_SIZE * 100;
+        p[current_pid].memory_utilization = (float)p[current_pid].physical_memeory / g_memory_total_size * 100;
         current_pid++;
         fclose(stat_fp);
         fclose(status_fp);
@@ -573,7 +557,7 @@ process *get_processes()
  * @param uid Process user id
  * @param buffer Return buffer
  */
-void get_user_name(int uid, char *buffer)
+void get_user_name(uint32_t uid, char *buffer)
 {
     struct passwd *upasswd = getpwuid(uid);
     strncpy(buffer, upasswd->pw_name, 16);
