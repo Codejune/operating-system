@@ -26,7 +26,7 @@ COMMON_OBJS = $(COMMON_SRCS:.c=.o)
 MYTOP_OBJS = $(MYTOP_SRCS:.c=.o)
 MYPS_OBJS = $(MYPS_SRCS:.c=.o)
 MYLSCPU_OBJS = $(MYLSCPU_SRCS:.c=.o)
-OBJS = $(MYTOP_OBJS) $(MYTOP_SRCS_OBJS) $(MYPS_OBJS)
+OBJS = $(MYTOP_OBJS) $(MYLSCPU_OBJS) $(MYPS_OBJS)
 # Library file
 LIBS = -lncurses
 # Include path

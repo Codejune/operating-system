@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (ioctl(0, TIOCGWINSZ, &WINDOW_SIZE) < 0)
     {
         fprintf(stderr, "ioctl error\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     g_cpu_total_time = get_cpu_total_time();
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         free(p[i]);
     free(p);
 
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 /**
@@ -73,11 +73,11 @@ void parse_option(int argc, char *argv[])
         // Print help
         case 'h':
             print_help();
-            exit(1);
+            exit(EXIT_FAILURE);
         // Unknown or invalid option
         case '?':
             print_help();
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 }
@@ -107,7 +107,7 @@ uint64_t get_cpu_total_time(void)
     if ((fp = fopen("/proc/stat", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/stat\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fscanf(fp, "%*s %ld %ld %ld %ld %ld %ld %ld %ld",
@@ -140,7 +140,7 @@ uint64_t get_memory_total_size(void)
     if ((fp = fopen("/proc/meminfo", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/meminfo\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fscanf(fp, "%*s%ld%*s\n", &total_size);
@@ -196,7 +196,7 @@ process **get_processes(void)
         if ((fp = fopen(file_name, "r")) == NULL)
         {
             fprintf(stderr, "fopen error for %s\n", file_name);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         tty = get_tty(pid);
@@ -241,7 +241,7 @@ uint16_t get_tty(uint32_t pid)
     if ((fp = fopen(file_name, "r")) == NULL)
     {
         fprintf(stderr, "fopen error for %s\n", file_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fscanf(fp, "%*d %*s %*c %*d %*d %*d %hd", &tty);
@@ -270,7 +270,7 @@ process *get_process_status(uint32_t pid)
     if ((fp = fopen(file_name, "r")) == NULL)
     {
         fprintf(stderr, "fopen error for %s\n", file_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     for (i = 0; i < 22; i++)
     {
@@ -336,7 +336,7 @@ process *get_process_status(uint32_t pid)
     if ((fp = fopen(file_name, "r")) == NULL)
     {
         fprintf(stderr, "fopen error for %s\n", file_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     while (true)
     {
@@ -509,7 +509,7 @@ time_t get_up_time(void)
     if ((fp = fopen("/proc/uptime", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/uptime\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     fscanf(fp, "%f", &time);
     fclose(fp);
@@ -533,7 +533,7 @@ void get_command(uint32_t pid, char *buffer)
     if ((fp = fopen(file_name, "r")) == NULL)
     {
         fprintf(stderr, "fopen error for %s\n", file_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     fp = fopen(file_name, "r");
     strcpy(tmp, buffer);

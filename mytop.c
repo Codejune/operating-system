@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         clear();
     }
     endwin();
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 /**
@@ -64,7 +64,7 @@ void parse_option(int argc, char *argv[])
         // Print help
         case 'h':
             print_help();
-            exit(1);
+            exit(EXIT_FAILURE);
         // Set refresh cycle
         case 'd':
             REFRESH_PERIOD = atoi(optarg);
@@ -76,7 +76,7 @@ void parse_option(int argc, char *argv[])
         // Unknown or invalid option
         case '?':
             print_help();
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 }
@@ -163,7 +163,7 @@ void get_uptime()
     if ((fp = fopen("/proc/uptime", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/uptime\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     fscanf(fp, "%f", &g_header.uptime);
     fclose(fp);
@@ -194,7 +194,7 @@ void get_load_average()
     if ((fp = fopen("/proc/loadavg", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/loadavg");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fscanf(fp, "%f %f %f", &g_header.load_average[0], &g_header.load_average[1], &g_header.load_average[2]);
@@ -270,7 +270,7 @@ void get_cpu_status()
     if ((fp = fopen("/proc/stat", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/stat\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fscanf(fp, "%*s %ld %ld %ld %ld %ld %ld %ld %ld",
@@ -319,7 +319,7 @@ void get_memmory_status()
     if ((fp = fopen("/proc/meminfo", "r")) == NULL)
     {
         fprintf(stderr, "fopen error for /proc/meminfo\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     for (i = 0; i < 22; i++)
