@@ -254,6 +254,11 @@ uint16_t get_tty(uint32_t pid)
     return tty;
 }
 
+/**
+ * @brief Get process detail status information
+ * @param pid Process ID
+ * @return process* process struct pointer
+ */
 process *get_process_status(uint32_t pid)
 {
     char file_name[MAX_BUFFER_SIZE] = {0}, buffer[BUFFER_SIZE] = {0};

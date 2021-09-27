@@ -389,14 +389,7 @@ void get_lcache_info(void)
     // L1d cache
     g_cpuinfo.l1d_cache.one_size = sysconf(_SC_LEVEL1_DCACHE_SIZE);
     g_cpuinfo.l1d_cache.all_size = g_cpuinfo.l1d_cache.one_size * g_cpuinfo.cpu_count;
-    path = L1D_CACHE_WAY_PATH;
-    if ((fp = fopen(path, "r")) == NULL)
-    {
-        fprintf(stderr, "fopen error for %s\n", path);
-        exit(EXIT_FAILURE);
-    }
-    fscanf(fp, "%hhd", &g_cpuinfo.l1d_cache.ways);
-    fclose(fp);
+    g_cpuinfo.l1d_cache.ways = sysconf(_SC_LEVEL1_DCACHE_ASSOC);
     path = L1D_CACHE_TYPE_PATH;
     if ((fp = fopen(path, "r")) == NULL)
     {
@@ -417,14 +410,7 @@ void get_lcache_info(void)
     // L1i cache
     g_cpuinfo.l1i_cache.one_size = sysconf(_SC_LEVEL1_ICACHE_SIZE);
     g_cpuinfo.l1i_cache.all_size = g_cpuinfo.l1i_cache.one_size * g_cpuinfo.cpu_count;
-    path = L1I_CACHE_WAY_PATH;
-    if ((fp = fopen(path, "r")) == NULL)
-    {
-        fprintf(stderr, "fopen error for %s\n", path);
-        exit(EXIT_FAILURE);
-    }
-    fscanf(fp, "%hhd", &g_cpuinfo.l1i_cache.ways);
-    fclose(fp);
+    g_cpuinfo.l1i_cache.ways = sysconf(_SC_LEVEL1_ICACHE_ASSOC);
     path = L1I_CACHE_TYPE_PATH;
     if ((fp = fopen(path, "r")) == NULL)
     {
@@ -445,7 +431,7 @@ void get_lcache_info(void)
     // L2 cache
     g_cpuinfo.l2_cache.one_size = sysconf(_SC_LEVEL2_CACHE_SIZE);
     g_cpuinfo.l2_cache.all_size = g_cpuinfo.l2_cache.one_size * g_cpuinfo.cpu_count;
-    path = L2_CACHE_WAY_PATH;
+    g_cpuinfo.l2_cache.ways = sysconf(_SC_LEVEL2_CACHE_ASSOC);
     if ((fp = fopen(path, "r")) == NULL)
     {
         fprintf(stderr, "fopen error for %s\n", path);
@@ -473,14 +459,7 @@ void get_lcache_info(void)
     // L3 cache
     g_cpuinfo.l3_cache.one_size = sysconf(_SC_LEVEL3_CACHE_SIZE);
     g_cpuinfo.l3_cache.all_size = g_cpuinfo.l3_cache.one_size * g_cpuinfo.socket_count;
-    path = L3_CACHE_WAY_PATH;
-    if ((fp = fopen(path, "r")) == NULL)
-    {
-        fprintf(stderr, "fopen error for %s\n", path);
-        exit(EXIT_FAILURE);
-    }
-    fscanf(fp, "%hhd", &g_cpuinfo.l3_cache.ways);
-    fclose(fp);
+    g_cpuinfo.l3_cache.ways = sysconf(_SC_LEVEL3_CACHE_ASSOC);
     path = L3_CACHE_TYPE_PATH;
     if ((fp = fopen(path, "r")) == NULL)
     {

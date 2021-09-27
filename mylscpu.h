@@ -46,16 +46,12 @@
 #define VULNERABILITY_SRBDS_PATH "/sys/devices/system/cpu/vulnerabilities/srbds";
 #define VULNERABILITY_TSX_ASYNC_ABORT_PATH "/sys/devices/system/cpu/vulnerabilities/tsx_async_abort";
 
-#define L1D_CACHE_WAY_PATH "/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity";
 #define L1D_CACHE_TYPE_PATH "/sys/devices/system/cpu/cpu0/cache/index0/type";
 #define L1D_CACHE_LEVEL_PATH "/sys/devices/system/cpu/cpu0/cache/index0/level";
-#define L1I_CACHE_WAY_PATH "/sys/devices/system/cpu/cpu0/cache/index1/ways_of_associativity";
 #define L1I_CACHE_TYPE_PATH "/sys/devices/system/cpu/cpu0/cache/index1/type";
 #define L1I_CACHE_LEVEL_PATH "/sys/devices/system/cpu/cpu0/cache/index1/level";
-#define L2_CACHE_WAY_PATH "/sys/devices/system/cpu/cpu0/cache/index2/ways_of_associativity";
 #define L2_CACHE_TYPE_PATH "/sys/devices/system/cpu/cpu0/cache/index2/type";
 #define L2_CACHE_LEVEL_PATH "/sys/devices/system/cpu/cpu0/cache/index2/level";
-#define L3_CACHE_WAY_PATH "/sys/devices/system/cpu/cpu0/cache/index3/ways_of_associativity";
 #define L3_CACHE_TYPE_PATH "/sys/devices/system/cpu/cpu0/cache/index3/type";
 #define L3_CACHE_LEVEL_PATH "/sys/devices/system/cpu/cpu0/cache/index3/level";
 
