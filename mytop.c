@@ -145,7 +145,7 @@ void update_header(void)
  * @brief Get current time 
  * @param h header struct pointer
  */
-void get_current_time()
+void get_current_time(void)
 {
     struct tm now_tm;
     time_t now_t;
@@ -157,7 +157,7 @@ void get_current_time()
 /**
  * @brief Get uptime from /proc/uptime
  */
-void get_uptime()
+void get_uptime(void)
 {
     FILE *fp;
     if ((fp = fopen("/proc/uptime", "r")) == NULL)
@@ -172,7 +172,7 @@ void get_uptime()
 /**
  * @brief Get user count from /etc/passwd
  */
-void get_user_count()
+void get_user_count(void)
 {
     struct utmp *user;
 
@@ -187,7 +187,7 @@ void get_user_count()
 /**
  * @brief Get load average from /proc/loadavg
  */
-void get_load_average()
+void get_load_average(void)
 {
     FILE *fp;
 
@@ -204,7 +204,7 @@ void get_load_average()
 /**
  * @brief Get status count of tasks from /proc
  */
-void get_tasks_status()
+void get_tasks_status(void)
 {
     FILE *fp;
     uint32_t i, file_count, pid = 1;
@@ -261,7 +261,7 @@ void get_tasks_status()
 /**
  * @brief Get cpu status for utilization
  */
-void get_cpu_status()
+void get_cpu_status(void)
 {
     uint64_t current_cpu_status[8];
     uint8_t i;
@@ -310,7 +310,7 @@ void get_cpu_status()
 /**
  * @brief Get memmory status from /proc/meminfo
  */
-void get_memmory_status()
+void get_memmory_status(void)
 {
     uint8_t i;
     uint64_t size, buffer_cache = 0;
@@ -363,7 +363,7 @@ void get_memmory_status()
 /**
  * @brief Print header information
  */
-void print_header()
+void print_header(void)
 {
     char buffer[MAX_BUFFER_SIZE] = {0};
     uint8_t hour, min;
@@ -422,7 +422,7 @@ void print_header()
  * @brief Get processes list
  * @return process* process struct pointer
  */
-process *get_processes()
+process *get_processes(void)
 {
     uint32_t file_count, current_pid = 0, i, j;
     double start_time;

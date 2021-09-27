@@ -11,7 +11,7 @@
  * @param argv Argument verse
  * @return int Ok 0, Error 1
  */
-int main(int argc, char *argv[])
+int main(void)
 {
     if (ioctl(0, TIOCGWINSZ, (char *)&WINDOW_SIZE) < 0)
     {
@@ -172,7 +172,6 @@ void trim_string(char *buffer)
 
 /**
  * @brief Get token list divide by divider from string
- * 
  * @param buffer Buffer
  * @param divider Divider character
  * @return char** Token list
@@ -209,6 +208,12 @@ char **get_tokenization(char *buffer, char divider)
     return tokens;
 }
 
+/**
+ * @brief Get tokens to serialized string
+ * @param tokens Token list
+ * @param token_count Token count
+ * @return char* Serialized string
+ */
 char *get_serialization(char **tokens, uint32_t token_count)
 {
     uint16_t i;
@@ -562,6 +567,9 @@ void get_byte_order(void)
         sprintf(g_cpuinfo.byte_order, "Big Endian");
 }
 
+/**
+ * @brief Print CPU information
+ */
 void print_lscpu(void)
 {
     uint32_t i;

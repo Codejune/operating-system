@@ -150,6 +150,10 @@ uint64_t get_memory_total_size(void)
     return total_size;
 }
 
+/**
+ * @brief Get processes list
+ * @return process** Process list
+ */
 process **get_processes(void)
 {
     char file_name[MAX_BUFFER_SIZE] = {0};
