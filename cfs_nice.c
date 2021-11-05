@@ -38,19 +38,19 @@ int main(int argc, char *argv[])
             {
                 nice(NICE_HIGH);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_HIGH, getpid());
-                fibonacci(33);
+                product(500);
             }
             else if (i < 14)
             {
                 nice(NICE_MID);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_MID, getpid());
-                fibonacci(33);
+                product(600);
             }
             else
             {
                 nice(NICE_LOW);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_LOW, getpid());
-                fibonacci(33);
+                product(700);
             }
             // sprintf(buf, "chrt -p %d", getpid());
             // system(buf);
@@ -85,19 +85,16 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 }
 
-/**
- * @brief Fibonacci calculate function
- * @param n number
- * @return uint64_t result
- */
-uint64_t fibonacci(uint64_t n)
+void product(uint64_t n)
 {
-    if (n <= 1)
-        return n;
-    else
-        return fibonacci(n - 1) + fibonacci(n - 2);
-}
+    uint32_t i, j, k;
+    uint64_t sum = 0;
 
+    for(i = 1; i <= n; i++)
+        for(j = 1; j <= n; j++)
+            for(k = 1; k <= n; k++)
+                sum+= i * j * k;
+}
 /**
  * @brief Print running time
  * @param begin_t start time

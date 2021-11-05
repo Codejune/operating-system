@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     struct timeval begin_t, end_t;
     char buf[512] = {0};
 
+    nice(-20);
     printf("Parent running,  PID: %d\n", getpid());
     gettimeofday(&begin_t, NULL);
     for (i = 0; i < SLAVE_COUNT; i++)
@@ -30,12 +31,11 @@ int main(int argc, char *argv[])
             perror("Failed to fork");
             exit(EXIT_FAILURE);
         }
-
         // Child process (PID = 0)
         if (pid == 0)
         {
-            printf("++ %2d Child created, PID: %d\n", i, getpid());
-            fibonacci(33);
+            printf("++ %2d Child created, PID: %d\n", i + 1, getpid());
+            product(600);
             // sprintf(buf, "chrt -p %d", getpid());
             // system(buf);
             exit(EXIT_SUCCESS);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         if ((pid = wait(&status)) > 1)
             for (j = 0; j < SLAVE_COUNT; j++)
                 if (pid_list[j] == pid)
-                    printf("-- %2d Child terminated, PID: %d\n", j, pid_list[j]);
+                    printf("-- %2d Child terminated, PID: %d\n", j + 1, pid_list[j]);
 
     gettimeofday(&end_t, NULL);
     print_runtime(&begin_t, &end_t);
@@ -57,17 +57,15 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 }
 
-/**
- * @brief Fibonacci calculate function
- * @param n number
- * @return uint64_t result
- */
-uint64_t fibonacci(uint64_t n)
+void product(uint64_t n)
 {
-    if (n <= 1)
-        return n;
-    else
-        return fibonacci(n - 1) + fibonacci(n - 2);
+    uint32_t i, j, k;
+    uint64_t sum = 0;
+
+    for(i = 1; i <= n; i++)
+        for(j = 1; j <= n; j++)
+            for(k = 1; k <= n; k++)
+                sum+= i * j * k;
 }
 
 /**

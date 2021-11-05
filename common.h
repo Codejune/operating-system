@@ -33,7 +33,7 @@
 
 
 // Function prototype
-uint64_t fibonacci(uint64_t n);
+void product(uint64_t n);
 void print_runtime(struct timeval *begin_t, struct timeval *end_t);
 
 #endif
