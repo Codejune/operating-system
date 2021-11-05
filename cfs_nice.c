@@ -38,22 +38,22 @@ int main(int argc, char *argv[])
             {
                 nice(NICE_HIGH);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_HIGH, getpid());
-                fibonacci(42);
+                fibonacci(33);
             }
             else if (i < 14)
             {
                 nice(NICE_MID);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_MID, getpid());
-                fibonacci(42);
+                fibonacci(33);
             }
             else
             {
                 nice(NICE_LOW);
                 printf("++ NICE(%3d) Child created, PID: %d\n", NICE_LOW, getpid());
-                fibonacci(42);
+                fibonacci(33);
             }
-            sprintf(buf, "chrt -p %d", getpid());
-            system(buf);
+            // sprintf(buf, "chrt -p %d", getpid());
+            // system(buf);
             exit(EXIT_SUCCESS);
         }
         // Parent process (PID != 0)
