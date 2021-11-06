@@ -17,7 +17,6 @@ int main(void)
     uint8_t i, j;
     uint32_t pid, pid_list[SLAVE_COUNT] = {0};
     struct timeval begin_t, end_t;
-    char buf[512] = {0};
 
     printf("Parent running,  PID: %d\n", getpid());
     gettimeofday(&begin_t, NULL);
