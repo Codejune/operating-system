@@ -1,7 +1,6 @@
 # Execute files
-mytop
-mylscpu
-myps
+cfs
+cfs_nice
 
 # Temporary files
 .dependency

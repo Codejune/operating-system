@@ -60,4 +60,4 @@ new:
 
 # make clean: Remove all generated file
 clean:
-	rm -rf $(OBJS) $(CFS_NICE)
+	rm -rf $(OBJS) $(CFS) $(CFS_NICE)
