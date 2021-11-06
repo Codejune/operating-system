@@ -1,7 +1,7 @@
 /**
- * @file schedule.c
+ * @file cfs.c
  * @author 김병준 (kbj9704@gmail.com)
- * @brief schedule 명령어 기능 함수 구현
+ * @brief 스케줄링 정책 확인을 위한 테스트 프로그램
  */
 #include "common.h"
 
@@ -11,7 +11,7 @@
  * @param argv Argument verse
  * @return int Ok 0, Error 1
  */
-int main(int argc, char *argv[])
+int main(void)
 {
     int status;
     uint8_t i, j;
@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
     struct timeval begin_t, end_t;
     char buf[512] = {0};
 
-    nice(-20);
     printf("Parent running,  PID: %d\n", getpid());
     gettimeofday(&begin_t, NULL);
     for (i = 0; i < SLAVE_COUNT; i++)
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
         if (pid == 0)
         {
             printf("++ %2d Child created, PID: %d\n", i + 1, getpid());
-            product(600);
+            product(500);
             // sprintf(buf, "chrt -p %d", getpid());
             // system(buf);
             exit(EXIT_SUCCESS);
@@ -57,15 +56,19 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 }
 
+/**
+ * @brief Simplified multiplication
+ * @param n Repeat count
+ */
 void product(uint64_t n)
 {
     uint32_t i, j, k;
     uint64_t sum = 0;
 
-    for(i = 1; i <= n; i++)
-        for(j = 1; j <= n; j++)
-            for(k = 1; k <= n; k++)
-                sum+= i * j * k;
+    for (i = 1; i <= n; i++)
+        for (j = 1; j <= n; j++)
+            for (k = 1; k <= n; k++)
+                sum += i * j * k;
 }
 
 /**

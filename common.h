@@ -1,7 +1,7 @@
 /**
  * @file common.h
  * @author 김병준 (kbj9704@gmail.com)
- * @brief common 명령어 구현에 필요한 헤더, 함수 및 매크로 정의
+ * @brief 프로그램 구현에 필요한 헤더, 함수 및 매크로 정의
  */
 #ifndef COMMON_H
 #define COMMON_H
@@ -23,14 +23,8 @@
 #define SECOND_TO_MICRO 1000000
 #define SLAVE_COUNT 21
 #define NICE_LOW -20
-#define NICE_MID 1
+#define NICE_MID 0
 #define NICE_HIGH 19
-
-// Struct
-
-
-// Glabal variable
-
 
 // Function prototype
 void product(uint64_t n);
