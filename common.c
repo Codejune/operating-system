@@ -5,7 +5,7 @@
  */
 #include "common.h"
 
-uint8_t g_pg_frms = 0;               // Page frames
+uint8_t g_frms_cnt = 0;               // Page frames
 uint8_t g_pg_ref[BUFFER_SIZE] = {0}; // Page reference list
 uint8_t g_pg_ref_cnt = 0;            // Page reference count
 
@@ -29,7 +29,7 @@ void init(void)
     }
 
     // Read and set page frms
-    fscanf(fp, "%hhd\n%[^\n]", &g_pg_frms, buffer);
+    fscanf(fp, "%hhd\n%[^\n]", &g_frms_cnt, buffer);
 
     // Set page references
     set_page_references(buffer);
@@ -74,12 +74,12 @@ void print_header(uint8_t method)
         printf("SC\n");
         break;
     }
-    printf("Page frames: %hhd\n", g_pg_frms);
+    printf("Page frames: %hhd\n", g_frms_cnt);
     printf("Page reference string: ");
     for (i = 0; i < g_pg_ref_cnt; i++)
         printf("%hhd ", g_pg_ref[i]);
-    printf("\n\tframe");
-    for (uint8_t i = 0; i < g_pg_frms; i++)
+    printf("\n\n\tframe");
+    for (uint8_t i = 0; i < g_frms_cnt; i++)
         printf("\t%d", i + 1);
     printf("\tpage fault\ntime\n");
 }

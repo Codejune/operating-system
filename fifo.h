@@ -12,6 +12,9 @@
 // Macro
 
 // Global Variable
+extern uint8_t g_frms_cnt;
+extern uint8_t g_pg_ref[BUFFER_SIZE];
+extern uint8_t g_pg_ref_cnt;
 
 // Function prototype
 void simulate(void);

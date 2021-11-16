@@ -41,17 +41,17 @@ INCS =
 # $@ = TARGET
 # $^ = DEPENDENCY
 all : $(OBJS)
-	$(CC) -o $(LRU) $(LRU_OBJS) $(LIBS)
+	$(CC) -o $(LRU) $(COMMON_OBJS) $(LRU_OBJS) $(LIBS)
 	$(CC) -o $(FIFO) $(COMMON_OBJS) $(FIFO_OBJS) $(LIBS)
-	$(CC) -o $(OPT) $(OPT_OBJS) $(LIBS)
-	$(CC) -o $(SC) $(SC_OBJS) $(LIBS)
-$(LRU) : $(LRU_OBJS) 
+	$(CC) -o $(OPT) $(COMMON_OBJS) $(OPT_OBJS) $(LIBS)
+	$(CC) -o $(SC) $(COMMON_OBJS) $(SC_OBJS) $(LIBS)
+$(LRU) : $(LRU_OBJS) $(COMMON_OBJS)
 	$(CC) -o $@ $^ $(LIBS)
 $(FIFO) : $(FIFO_OBJS) $(COMMON_OBJS)
 	$(CC) -o $@ $^ $(LIBS)
-$(OPT) : $(OPT_OBJS) 
+$(OPT) : $(OPT_OBJS) $(COMMON_OBJS)
 	$(CC) -o $@ $^ $(LIBS)
-$(SC) : $(SC_OBJS) 
+$(SC) : $(SC_OBJS) $(COMMON_OBJS)
 	$(CC) -o $@ $^ $(LIBS)
 
 # Object file generation
