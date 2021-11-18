@@ -1,8 +1,9 @@
 # Virtual Memory Paging Simulator
-가상메모리 관리 기법의 하나인 페이지 교체 기법 중 OPT, FIFO, LRU, Second-Chance
-를 구현하고 동작 과정을 보여주는 시뮬레이터 구현하기
 
-## 0. 빠른 시작
+가상메모리 관리 기법의 하나인 페이지 교체 기법 중 OPT, FIFO, LRU, Second-Chance를 구현하고 동작 과정을 보여주는 시뮬레이터 구현하기
+
+## 0. Quick start
+
 ``` bash
 $ git clone https://github.com/codejune/c-virtual-memory-simulator.git
 $ cd c-virtual-memory-simulator
@@ -15,38 +16,53 @@ $ make opt
 $ ./opt
 ```
 
-## 1. 환경
-### a. SW
+## 1. Environment
+
+### Software
+
 - Ubuntu 20.04.3 LTS (x86_64)
 - Linux Kernel 5.11.22
-### b. HW
+
+### Hardware
+
 - VM Instance
-- 4 Core 8 Thread 
+- 4 Core 8 Thread
 - 8 GB RAM
 - 60 GB Storage
 
-## 2. 요구사항
-### a. 페이징 기법 단축어 
+## 2. Requirement
+
+### 페이징 기법 단축어
+
 - OPT: opt
 - FIFO: fifo
 - LRU: lru
 - Second-Chance: sc
-### b. 제약 사항
+
+### 입력
+
 - Page frame: min 1, max 4
 - Page reference string: min 1, max 30
-- Second-Chance 기법의 경우 참조 기록에 대한 주기적 Refresh는 없다고 가정
-### c. 구현 사항
+
+### 조건
+
 - 실행 초기화면에서 입력 데이터의 파일 이름을 입력 받음
 - 입력 데이터에는 Page frame 수, Page reference string 값 포함
 - 각 기법간 Paging 과정 및 page fault 발생 출력
-### d. 예시
-- 입력 데이터 
+- Second-Chance 기법의 경우 참조 기록에 대한 주기적 Refresh는 없다고 가정
+
+### 출력
+
+- Input data
+
     ``` bash
     $ cat input.txt                        
     3                           # Page frame 수
     2 3 2 1 5 2 4 5 3 2 5 2     # Page reference string
     ```
-- 출력 결과 (OPT)
+
+- Output (OPT)
+
     ``` bash
     $ ./opt
     Input file path > input.txt
@@ -70,7 +86,9 @@ $ ./opt
     12              2       3       5
     Number of page faults: 6 times
     ```
-- 출력 결과 (FIFO)
+
+- Output (FIFO)
+
     ``` bash
     $ ./fifo
     Input file path > input.txt
@@ -94,7 +112,9 @@ $ ./opt
     12              3       5       2       F
     Number of page faults: 9 times
     ```
-- 출력 결과 (LRU)
+
+- Output (LRU)
+
     ``` bash
     $ ./lru 
     Input file path > input.txt
@@ -118,7 +138,9 @@ $ ./opt
     12              3       5       2
     Number of page faults: 7 times
     ```
-- 출력 결과 (Second-Chance)
+
+- Output (Second-Chance)
+
     ``` bash
     $ ./sc 
     Input file path > input.txt
