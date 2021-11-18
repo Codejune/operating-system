@@ -10,9 +10,10 @@ cd c-linux-syscall
 
 # 시스템 콜 추가
 cp sys_* {linux_kernel_dir}/kernel/
+cp kernel_Makefile {linux_kernel_dir}/kernel/Makefile
 cp syscalls.h {linux_kernel_dir}/include/linux/
 cp syscall_64.tbl {linux_kernel_dir}/arch/x86/entry/syscalls/
-# ... Do kernel build and reboot your system
+# Do kernel build and reboot your system
 
 # 테스트 프로그램 빌드 및 실행
 make
