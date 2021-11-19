@@ -230,8 +230,6 @@ void *t_intrsect(void *arg)
         }
         pthread_mutex_unlock(&g_mutex);
 
-        q_print();
-
         // Send signal to way which is send vehicle to the intersection
         pthread_cond_broadcast(&g_tf_cond);
 

@@ -84,86 +84,79 @@ tick: 3
 Passed Vehicle
 Car 
 Waiting Vehicle
-Car 3 
+Car 4 
 ==========================
 tick: 4
 ==========================
 Passed Vehicle
-Car 4
+Car 3
 Waiting Vehicle
-Car 3 4 
+Car 4 4 
 ==========================
 tick: 5
 ==========================
 Passed Vehicle
 Car 
 Waiting Vehicle
-Car 4 
+Car 1 4 
 ==========================
 tick: 6
 ==========================
 Passed Vehicle
-Car 3
+Car 4
 Waiting Vehicle
-Car 2 4 
+Car 1 4 
 ==========================
 tick: 7
 ==========================
 Passed Vehicle
-Car 
+Car 2
 Waiting Vehicle
-Car 2 
+Car 1 2 
 ==========================
 tick: 8
 ==========================
 Passed Vehicle
-Car 2
+Car 4
 Waiting Vehicle
-Car 2 3 
+Car 1 3 
 ==========================
 tick: 9
+==========================
+Passed Vehicle
+Car 2
+Waiting Vehicle
+Car 1 3 3 
+==========================
+tick: 10
 ==========================
 Passed Vehicle
 Car 
 Waiting Vehicle
 Car 3 3 
 ==========================
-tick: 10
-==========================
-Passed Vehicle
-Car 2
-Waiting Vehicle
-Car 3 
-==========================
 tick: 11
 ==========================
 Passed Vehicle
-Car 
+Car 1
 Waiting Vehicle
 Car 3 3 
 ==========================
 tick: 12
 ==========================
 Passed Vehicle
-Car 3
-Waiting Vehicle
-Car 3 3 
-==========================
-tick: 13
-==========================
-Passed Vehicle
 Car 
 Waiting Vehicle
 Car 3 
 ==========================
-tick: 14
+tick: 13
 ==========================
 Passed Vehicle
 Car 3
 Waiting Vehicle
 Car 3 
 ==========================
-tick: 15
+tick: 14
 ==========================
 Passed Vehicle
 Car 
@@ -173,7 +166,7 @@ Car
 Number of vehicles passed from each start point
 P1: 1 times
 P2: 2 times
-P3: 3 times
+P3: 4 times
 P4: 3 times
-Total time: 15 ticks
+Total time: 14 ticks
 ```

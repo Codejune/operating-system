@@ -21,7 +21,7 @@
 #define MAX_VHCLE_COUNT 16             // Maximal vehicle count
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
-#define DEBUG 1                        // Debug mode
+// #define DEBUG 1                        // Debug mode
 // Structure
 /**
  * @brief Traffic type enumeration
