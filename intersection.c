@@ -24,10 +24,6 @@ int main(void)
     // Initialize way queue
     init_way_q();
 
-    for (i = 0; i < g_vhcle_cnt; i++)
-    {
-        printf("%hhd\n", g_vhcle_q.data[i]);
-    }
     // Generate way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
@@ -105,13 +101,13 @@ void init_vhcle_q(void)
     printf("Start point: ");
     for (i = 0; i < g_vhcle_cnt; i++)
     {
-#ifndef DEBUG
-        way = rand() % MAX_VHCLE_COUNT + 1;
-        printf("%d ", way);
-        q_put(g_vhcle_q, way);
-#else
+#ifdef DEBUG
         printf("%d ", test_data[i]);
-        q_put(g_vhcle_q, test_data[i]);
+        q_put(&g_vhcle_q, test_data[i]);
+#else
+        way = rand() % MAX_WAY_COUNT + 1;
+        printf("%d ", way);
+        q_put(&g_vhcle_q, way);
 #endif
     }
     printf("\n");
@@ -128,9 +124,9 @@ void init_way_q(void)
 
     for (i = 0; i < g_vhcle_cnt; i++)
     {
-        g_way_q[i].items = 0;
-        g_way_q[i].head = 0;
-        g_way_q[i].tail = 0;
+        g_way_q[i].cnt = 0;
+        g_way_q[i].front = 0;
+        g_way_q[i].rear = 0;
     }
 }
 
@@ -139,9 +135,9 @@ void init_way_q(void)
  * @param q Target queue
  * @return true Queue is empty, false Queue is not empty
  */
-bool q_is_empty(queue_t q)
+bool q_is_empty(queue_t *q)
 {
-    return q.items == 0 ? true : false;
+    return q->cnt == 0 ? true : false;
 }
 
 /**
@@ -149,9 +145,9 @@ bool q_is_empty(queue_t q)
  * @param q Target queue
  * @return true Queue is full, false Queue is not full
  */
-bool q_is_full(queue_t q)
+bool q_is_full(queue_t *q)
 {
-    return q.items == MAX_QUEUE_SIZE ? true : false;
+    return q->cnt == MAX_QUEUE_SIZE ? true : false;
 }
 
 /**
@@ -159,11 +155,11 @@ bool q_is_full(queue_t q)
  * @param q Target queue
  * @param data Way number
  */
-void q_put(queue_t q, uint8_t data)
+void q_put(queue_t *q, uint8_t data)
 {
-    q.data[q.head] = data;
-    q.head = (q.head + 1) % MAX_QUEUE_SIZE;
-    q.items++;
+    q->data[q->front++] = data;
+    q->front %= MAX_QUEUE_SIZE;
+    q->cnt++;
 }
 
 /**
@@ -171,49 +167,66 @@ void q_put(queue_t q, uint8_t data)
  * @param q Target queue
  * @return uint8_t Way number
  */
-uint8_t q_get(queue_t q)
+uint8_t q_get(queue_t *q)
 {
     uint8_t data;
-    data = q.data[q.tail];
-    q.tail = (q.tail + 1) % MAX_QUEUE_SIZE;
-    q.items--;
+    data = q->data[q->rear++];
+    q->rear %= MAX_QUEUE_SIZE;
+    q->cnt--;
     return data;
 }
 
 void *t_intrsect(void *arg)
 {
-    uint8_t tick, way;
+    uint8_t tick, way, passed, i;
 
     tick = 1;
 
     // Traffic signal routine
     while (true)
     {
+        passed = 0;
         printf("tick: %hhd\n", tick);
 
         // Get vehicle from queue and put it on the way
-        if (!q_is_empty(g_vhcle_q))
+        if (!q_is_empty(&g_vhcle_q))
         {
-            way = q_get(g_vhcle_q);
-            q_put(g_way_q[way - 1], way);
+            way = q_get(&g_vhcle_q);
+            q_put(&g_way_q[way - 1], way);
         }
 
         // Send signal to way which is send vehicle to the intersection
         pthread_cond_broadcast(&g_tf_cond);
 
-        // pthread_mutex_lock(&g_mutex);
-
         // Wait for signal from way which is receive vehicle from the intersection
         pthread_cond_wait(&g_w_cond, &g_mutex);
+
+        // Check vehicle is passed
+        for (i = 0; i < 2; i++)
+        {
+            if (g_intrsect.is_running[i] && --g_intrsect.passing[i][1] == 0)
+            {
+                passed = g_intrsect.passing[i][0];
+                g_intrsect.is_running[i] = false;
+            }
+        }
+
+        if (!g_intrsect.is_running[0] && g_intrsect.is_running[1])
+            g_intrsect.traffic_type = TRAFFIC_TYPE_NOT_RUNNING;
 
         printf("==========================\n");
         printf("Passed Vehicle\n");
         printf("Car ");
+        if (passed > 0)
+            printf("%hhd\n", passed);
+        else
+            printf("\n");
         printf("Waiting Vehicle\n");
         printf("Car ");
-        printf("==========================\n");
+        printf("\n==========================\n");
 
         pthread_mutex_unlock(&g_mutex);
+        tick++;
     }
 }
 
@@ -232,7 +245,7 @@ void *t_way(void *arg)
     {
         pthread_cond_wait(&g_tf_cond, &g_mutex);
 
-        if (q_is_empty(g_way_q[way]))
+        if (q_is_empty(&g_way_q[way]))
         {
             pthread_mutex_unlock(&g_mutex);
             continue;
@@ -243,7 +256,7 @@ void *t_way(void *arg)
         if (g_intrsect.traffic_type == TRAFFIC_TYPE_NOT_RUNNING)
         {
             g_intrsect.traffic_type = way % 2;
-            g_intrsect.passing[0][0] = q_get(g_way_q[way]);
+            g_intrsect.passing[0][0] = q_get(&g_way_q[way]);
             g_intrsect.passing[0][1] = 2;
             g_intrsect.is_running[0] = true;
         }
@@ -253,13 +266,13 @@ void *t_way(void *arg)
             // Road is not full and there is no same start way
             if (g_intrsect.is_running[0] && g_intrsect.passing[0][0] != way && !g_intrsect.is_running[1])
             {
-                g_intrsect.passing[1][0] = q_get(g_way_q[way]);
+                g_intrsect.passing[1][0] = q_get(&g_way_q[way]);
                 g_intrsect.passing[1][1] = 2;
                 g_intrsect.is_running[1] = true;
             }
             else if (g_intrsect.is_running[1] && g_intrsect.passing[1][0] != way && !g_intrsect.is_running[0])
             {
-                g_intrsect.passing[0][0] = q_get(g_way_q[way]);
+                g_intrsect.passing[0][0] = q_get(&g_way_q[way]);
                 g_intrsect.passing[0][1] = 2;
                 g_intrsect.is_running[0] = true;
             }

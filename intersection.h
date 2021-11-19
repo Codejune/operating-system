@@ -39,9 +39,9 @@ typedef enum traffic_t
 typedef struct queue_t
 {
     uint8_t data[MAX_VHCLE_COUNT]; // Queue data
-    uint8_t items;                 // Number of items
-    uint8_t head;                  // Head index
-    uint8_t tail;                  // Tail index
+    uint8_t cnt;                 // Number of items
+    uint8_t front;                  // Head index
+    uint8_t rear;                  // Tail index
 } queue_t;
 
 /**
@@ -68,10 +68,10 @@ uint8_t g_passed_vhcle[MAX_WAY_COUNT] = {0};         // Passed vehicle
 void init_intrsect(void);
 void init_vhcle_q(void);
 void init_way_q(void);
-bool q_is_empty(queue_t q);
-bool q_is_full(queue_t q);
-void q_put(queue_t q, uint8_t data);
-uint8_t q_get(queue_t q);
+bool q_is_empty(queue_t *q);
+bool q_is_full(queue_t *q);
+void q_put(queue_t *q, uint8_t data);
+uint8_t q_get(queue_t *q);
 void *t_intrsect(void *arg);
 void *t_way(void *arg);
 #endif
