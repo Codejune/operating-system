@@ -14,13 +14,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 #include <pthread.h>
 
 // Macro
+#define SECOND_TO_MICRO 1000000
 #define MAX_VHCLE_COUNT 15                 // Maximal vehicle count
 #define MAX_WAY_COUNT 4                    // Maximal way count
-#define MAX_QUEUE_SIZE MAX_VHCLE_COUNT - 1 // Maximal queue size
+#define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
 #define DEBUG 1                            // Debug mode
 // Structure
 /**
@@ -28,9 +28,9 @@
  */
 typedef enum traffic_t
 {
-    TRAFFIC_TYPE_HORIZONTAL = 0, // P1, P3
-    TRAFFIC_TYPE_VERTICAL,       // P2, P4
-    TRAFFIC_TYPE_NOT_RUNNING,    // Not running
+    TRAFFIC_TYPE_VERTICAL = 0,   // P1, P3
+    TRAFFIC_TYPE_HORIZONTAL = 1, // P2, P4
+    TRAFFIC_TYPE_NO_RUNNING = 2, // Not running
 } traffic_t;
 
 /**
@@ -39,8 +39,7 @@ typedef enum traffic_t
 typedef struct queue_t
 {
     uint8_t data[MAX_VHCLE_COUNT]; // Queue data
-    uint8_t cnt;                 // Number of items
-    uint8_t front;                  // Head index
+    uint8_t front;                 // Head index
     uint8_t rear;                  // Tail index
 } queue_t;
 
@@ -49,20 +48,21 @@ typedef struct queue_t
  */
 typedef struct intrsect_t
 {
-    uint8_t passing[2][2];       // Passing road, left time of passing
-    enum traffic_t traffic_type; // Traffic type
-    bool is_running[2];          // Way status
+    uint8_t passing[2][2];              // Passing road, left time of passing
+    enum traffic_t traffic_type;        // Traffic type
+    bool is_running[2];                 // Way status
+    bool is_way_checked[MAX_WAY_COUNT]; // Way checked status
 } intrsect_t;
 
 // Global Variable
 pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex lock variable
 pthread_cond_t g_tf_cond = PTHREAD_COND_INITIALIZER; // Traffic Signal condition variable
-pthread_cond_t g_w_cond = PTHREAD_COND_INITIALIZER;  // Way condition variable
 uint8_t g_vhcle_cnt;                                 // Vehicle count
 queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
 uint8_t g_passed_vhcle[MAX_WAY_COUNT] = {0};         // Passed vehicle
+uint8_t g_total_ticks = 0;
 
 // Function prototype
 void init_intrsect(void);
@@ -70,8 +70,9 @@ void init_vhcle_q(void);
 void init_way_q(void);
 bool q_is_empty(queue_t *q);
 bool q_is_full(queue_t *q);
-void q_put(queue_t *q, uint8_t data);
-uint8_t q_get(queue_t *q);
+void q_enq(queue_t *q, uint8_t data);
+uint8_t q_deq(queue_t *q);
+void q_print(void);
 void *t_intrsect(void *arg);
 void *t_way(void *arg);
 #endif
