@@ -60,6 +60,120 @@ make
 - 모든 차량에 대한 진행이 완료된 후에는 각 출발점마다 총 진행된 차량 수, 모든 차량이
 통고하는데 걸린 총 걸린 시간을 출력함
 
+### 예시
+
 ``` bash
-./intersection
+./intersection 
+Start point: 4 4 3 4 1 2 2 3 3 3 
+tick: 1
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 
+==========================
+tick: 2
+==========================
+Passed Vehicle
+Car 4
+Waiting Vehicle
+Car 4 
+==========================
+tick: 3
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 3 
+==========================
+tick: 4
+==========================
+Passed Vehicle
+Car 4
+Waiting Vehicle
+Car 3 4 
+==========================
+tick: 5
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 4 
+==========================
+tick: 6
+==========================
+Passed Vehicle
+Car 3
+Waiting Vehicle
+Car 2 4 
+==========================
+tick: 7
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 2 
+==========================
+tick: 8
+==========================
+Passed Vehicle
+Car 2
+Waiting Vehicle
+Car 2 3 
+==========================
+tick: 9
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 3 3 
+==========================
+tick: 10
+==========================
+Passed Vehicle
+Car 2
+Waiting Vehicle
+Car 3 
+==========================
+tick: 11
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 3 3 
+==========================
+tick: 12
+==========================
+Passed Vehicle
+Car 3
+Waiting Vehicle
+Car 3 3 
+==========================
+tick: 13
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 3 
+==========================
+tick: 14
+==========================
+Passed Vehicle
+Car 3
+Waiting Vehicle
+Car 3 
+==========================
+tick: 15
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 
+==========================
+Number of vehicles passed from each start point
+P1: 1 times
+P2: 2 times
+P3: 3 times
+P4: 3 times
+Total time: 15 ticks
 ```
