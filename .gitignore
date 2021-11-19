@@ -1,8 +1,5 @@
 # Execute files
-fifo
-sc
-lru
-opt
+intersection
 
 # Temporary files
 .dependency
