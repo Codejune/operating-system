@@ -22,7 +22,7 @@ SRCS = $(INTERSECTION_SRCS)
 INTERSECTION_OBJS = $(INTERSECTION_SRCS:.c=.o)
 OBJS = $(INTERSECTION_OBJS)
 # Library file
-LIBS =
+LIBS = -lpthread
 # Include path
 INCS =
 
