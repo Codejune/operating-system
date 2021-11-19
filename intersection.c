@@ -114,7 +114,7 @@ void init_vhcle_q(void)
 #else
         way = rand() % MAX_WAY_COUNT + 1;
         printf("%d ", way);
-        q_put(&g_vhcle_q, way);
+        q_enq(&g_vhcle_q, way);
 #endif
     }
     printf("\n");
@@ -210,10 +210,8 @@ void q_print(void)
 
 void *t_intrsect(void *arg)
 {
-    uint8_t tick, way, passed, i, j;
+    uint8_t way, passed, i, j;
     bool is_not_checked, is_all_q_empty;
-
-    tick = 1;
 
     // Traffic signal routine
     while (true)
@@ -231,6 +229,8 @@ void *t_intrsect(void *arg)
             q_enq(&g_way_q[way - 1], way);
         }
         pthread_mutex_unlock(&g_mutex);
+
+        q_print();
 
         // Send signal to way which is send vehicle to the intersection
         pthread_cond_broadcast(&g_tf_cond);
@@ -282,10 +282,9 @@ void *t_intrsect(void *arg)
                     printf("%hhd ", g_way_q[i].data[j]);
                 } while (j == g_way_q[i].rear - 1);
             }
-        
         printf("\n==========================\n");
 
-        // Loop finish trigger
+        // Loop exit trigger
         if (!q_is_empty(&g_vhcle_q))
             continue;
 
@@ -296,8 +295,24 @@ void *t_intrsect(void *arg)
         if (!is_all_q_empty)
             continue;
 
+        // Last check vehicle is passed
+        for (i = 0; i < 2; i++)
+        {
+            if (g_intrsect.is_running[i])
+            {
+                g_intrsect.passing[i][1]--;
+                if (g_intrsect.passing[i][1] == 0)
+                {
+                    passed = g_intrsect.passing[i][0];
+                    g_intrsect.passing[i][0] = 0;
+                    g_intrsect.is_running[i] = false;
+                    g_passed_vhcle[passed - 1]++;
+                }
+            }
+        }
         break;
     }
+    return 0;
 }
 
 /**
@@ -319,9 +334,6 @@ void *t_way(void *arg)
             // Second, Check is vehicle is already running on this way
             if (g_intrsect.passing[0][0] == way || g_intrsect.passing[1][0] == way)
             {
-                // printf("way = %hhd, passing[0][0] = %hhd, passing[0][1] = %hhd, is_running[0] = %hhd\n", way, g_intrsect.passing[0][0], g_intrsect.passing[0][1], g_intrsect.is_running[0]);
-                // printf("way = %hhd, passing[1][0] = %hhd, passing[1][1] = %hhd, is_running[1] = %hhd\n", way, g_intrsect.passing[1][0], g_intrsect.passing[1][1], g_intrsect.is_running[1]);
-                // printf("11111111111111111111111111111111111\n");
                 g_intrsect.is_way_checked[way - 1] = true;
                 pthread_mutex_unlock(&g_mutex);
                 continue;
@@ -335,45 +347,26 @@ void *t_way(void *arg)
                 g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                 g_intrsect.passing[0][1] = 2;
                 g_intrsect.is_running[0] = true;
-                // printf("way = %hhd, passing[0][0] = %hhd, passing[0][1] = %hhd, is_running[0] = %hhd\n", way, g_intrsect.passing[0][0], g_intrsect.passing[0][1], g_intrsect.is_running[0]);
-                // printf("way = %hhd, passing[1][0] = %hhd, passing[1][1] = %hhd, is_running[1] = %hhd\n", way, g_intrsect.passing[1][0], g_intrsect.passing[1][1], g_intrsect.is_running[1]);
-                // printf("2222222222222222222222222222222222\n");
             }
             // Traffic type is matched
             else if (g_intrsect.traffic_type == (way % 2))
             {
                 // Road is not full and there is no same start way
-                if (g_intrsect.is_running[0])
+                if (!g_intrsect.is_running[0])
                 {
-                    // printf("way = %hhd, passing[0][0] = %hhd, passing[0][1] = %hhd, is_running[0] = %hhd\n", way, g_intrsect.passing[0][0], g_intrsect.passing[0][1], g_intrsect.is_running[0]);
-                    // printf("way = %hhd, passing[1][0] = %hhd, passing[1][1] = %hhd, is_running[1] = %hhd\n", way, g_intrsect.passing[1][0], g_intrsect.passing[1][1], g_intrsect.is_running[1]);
-                    // printf("333333333333333333333333333333333333\n");
-                    g_intrsect.traffic_type = way % 2;
-                    g_intrsect.passing[1][0] = q_deq(&g_way_q[way - 1]);
-                    g_intrsect.passing[1][1] = 2;
-                    g_intrsect.is_running[1] = true;
-                }
-                else if (g_intrsect.is_running[1])
-                {
-                    // printf("way = %hhd, passing[0][0] = %hhd, passing[0][1] = %hhd, is_running[0] = %hhd\n", way, g_intrsect.passing[0][0], g_intrsect.passing[0][1], g_intrsect.is_running[0]);
-                    // printf("way = %hhd, passing[1][0] = %hhd, passing[1][1] = %hhd, is_running[1] = %hhd\n", way, g_intrsect.passing[1][0], g_intrsect.passing[1][1], g_intrsect.is_running[1]);
-                    // printf("4444444444444444444444444444444444444\n");
                     g_intrsect.traffic_type = way % 2;
                     g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[0][1] = 2;
                     g_intrsect.is_running[0] = true;
                 }
+                else
+                {
+                    g_intrsect.traffic_type = way % 2;
+                    g_intrsect.passing[1][0] = q_deq(&g_way_q[way - 1]);
+                    g_intrsect.passing[1][1] = 2;
+                    g_intrsect.is_running[1] = true;
+                }
             }
-            // else
-            // {
-            //     printf("type = %hhd, way = %hhd, passing[0][0] = %hhd, passing[0][1] = %hhd, is_running[0] = %hhd\n", g_intrsect.traffic_type, way, g_intrsect.passing[0][0], g_intrsect.passing[0][1], g_intrsect.is_running[0]);
-            //     printf("type = %hhd, way = %hhd, passing[1][0] = %hhd, passing[1][1] = %hhd, is_running[1] = %hhd\n", g_intrsect.traffic_type, way, g_intrsect.passing[1][0], g_intrsect.passing[1][1], g_intrsect.is_running[1]);
-            //     printf("5555555555555555555555555555555555555555\n");
-            //     g_intrsect.traffic_type = way % 2;
-            //     g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
-            //     g_intrsect.passing[0][1] = 2;
-            //     g_intrsect.is_running[0] = true;
-            // }
         }
 
         g_intrsect.is_way_checked[way - 1] = true;
