@@ -208,6 +208,10 @@ void q_print(void)
     }
 }
 
+/**
+ * @brief Intersection thread function which is managing traffic
+ * @return void* NULL
+ */
 void *t_intrsect(void *arg)
 {
     uint8_t way, passed, i, j;
@@ -310,7 +314,7 @@ void *t_intrsect(void *arg)
         }
         break;
     }
-    return 0;
+    return NULL;
 }
 
 /**
@@ -372,4 +376,5 @@ void *t_way(void *arg)
         // Unlock pthread mutex
         pthread_mutex_unlock(&g_mutex);
     }
+    return NULL;
 }
