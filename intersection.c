@@ -76,7 +76,7 @@ int main(void)
 void init_intrsect(void)
 {
     g_intrsect.direction = DIRECTION_EMPTY;
-    memset(g_intrsect.is_running, false, 2 * sizeof(bool));
+    memset(g_intrsect.is_way_running, false, 2 * sizeof(bool));
 }
 
 /**
@@ -221,7 +221,6 @@ void *t_intrsect(void *arg)
     while (true)
     {
         // Initialize status variables
-        is_all_way_checked = false;
         g_intrsect.is_direct_changed = false;
         memset(g_intrsect.is_way_checked, false, MAX_WAY_COUNT * sizeof(bool));
         passed_vhcle = 0;
@@ -239,34 +238,37 @@ void *t_intrsect(void *arg)
         pthread_cond_broadcast(&g_tf_cond);
 
         // Wait for all way thread is checked
-        while (!is_all_way_checked)
+        while (true)
         {
+            is_all_way_checked = true;
             for (i = 0; i < MAX_WAY_COUNT; i++)
-                if (g_intrsect.is_way_checked[i] == false)
+                if (!g_intrsect.is_way_checked[i])
                 {
-                    is_all_way_checked = true;
+                    is_all_way_checked = false;
                     break;
                 }
-            usleep(0.5 * SECOND_TO_MICRO);
+
+            if (is_all_way_checked)
+                break;
         }
 
         // Check vehicle is passed
         for (i = 0; i < 2; i++)
         {
-            if (g_intrsect.is_running[i])
+            if (g_intrsect.is_way_running[i])
             {
                 g_intrsect.passing[i][1]--;
                 if (g_intrsect.passing[i][1] == 0)
                 {
                     passed_vhcle = g_intrsect.passing[i][0];
                     g_intrsect.passing[i][0] = 0;
-                    g_intrsect.is_running[i] = false;
+                    g_intrsect.is_way_running[i] = false;
                     g_passed_vhcle[passed_vhcle - 1]++;
                 }
             }
         }
 
-        if (!g_intrsect.is_running[0] && !g_intrsect.is_running[1])
+        if (!g_intrsect.is_way_running[0] && !g_intrsect.is_way_running[1])
             g_intrsect.direction = DIRECTION_EMPTY;
 
         print_intrsect(passed_vhcle);
@@ -308,7 +310,7 @@ void *t_way(void *arg)
                 g_intrsect.direction = way % 2;
                 g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                 g_intrsect.passing[0][1] = 2;
-                g_intrsect.is_running[0] = true;
+                g_intrsect.is_way_running[0] = true;
                 g_intrsect.is_direct_changed = true;
             }
             // Traffic type is matched
@@ -316,17 +318,17 @@ void *t_way(void *arg)
             {
 
                 // Road is not full and there is no same start way
-                if (!g_intrsect.is_running[0] && !g_intrsect.is_direct_changed)
+                if (!g_intrsect.is_way_running[0] && !g_intrsect.is_direct_changed)
                 {
                     g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[0][1] = 2;
-                    g_intrsect.is_running[0] = true;
+                    g_intrsect.is_way_running[0] = true;
                 }
-                else if (!g_intrsect.is_running[1] && !g_intrsect.is_direct_changed)
+                else if (!g_intrsect.is_way_running[1] && !g_intrsect.is_direct_changed)
                 {
                     g_intrsect.passing[1][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[1][1] = 2;
-                    g_intrsect.is_running[1] = true;
+                    g_intrsect.is_way_running[1] = true;
                 }
             }
         }

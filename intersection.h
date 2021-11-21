@@ -48,10 +48,10 @@ typedef struct queue_t
  */
 typedef struct intrsect_t
 {
-    uint8_t passing[2][2];              // Passing road, left time of passing
+    uint8_t passing[2][2];              // [Passing road][Left time]
     enum directon_t direction;          // Traffic direction
     bool is_direct_changed;             // Direction changed
-    bool is_running[2];                 // Way status
+    bool is_way_running[2];             // Way status
     bool is_way_checked[MAX_WAY_COUNT]; // Way thread checked status
 } intrsect_t;
 
