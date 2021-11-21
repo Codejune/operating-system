@@ -22,6 +22,7 @@
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
 // #define DEBUG 1                        // Debug mode
+
 // Structure
 /**
  * @brief Traffic type enumeration
@@ -48,11 +49,11 @@ typedef struct queue_t
  */
 typedef struct intrsect_t
 {
-    uint8_t passing[2][2];              // [Passing road][Left time]
-    enum directon_t direction;          // Traffic direction
-    bool is_direct_changed;             // Direction changed
-    bool is_way_running[2];             // Way status
-    bool is_way_checked[MAX_WAY_COUNT]; // Way thread checked status
+    uint8_t passing[2][2];             // [Passing road][Left time]
+    enum directon_t direction;         // Traffic direction
+    bool is_direct_changed;            // Direction changed
+    bool is_way_running[2];            // Way status
+    bool is_way_finish[MAX_WAY_COUNT]; // Way thread checked status
 } intrsect_t;
 
 // Global Variable
@@ -75,8 +76,10 @@ void q_enq(queue_t *q, uint8_t data);
 uint8_t q_deq(queue_t *q);
 void q_print(void);
 void *t_intrsect(void *arg);
+void set_vhcle_ready(void);
+void wait_ways_finish(void);
 void *t_way(void *arg);
-bool is_finished(void);
+bool is_intrsect_finish(void);
 bool is_vhcle_running(uint8_t way);
 void print_intrsect(uint8_t passed_vhcle);
 #endif

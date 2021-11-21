@@ -84,7 +84,7 @@ void init_intrsect(void)
     }
     g_intrsect.direction = DIRECTION_EMPTY;
     memset(g_intrsect.is_way_running, false, 2 * sizeof(bool));
-    memset(g_intrsect.is_way_checked, false, 4 * sizeof(bool));
+    memset(g_intrsect.is_way_finish, false, 4 * sizeof(bool));
 }
 
 /**
@@ -222,38 +222,21 @@ void q_print(void)
  */
 void *t_intrsect(void *arg)
 {
-    uint8_t way, passed_vhcle, i;
-    bool is_all_way_checked;
+    uint8_t passed_vhcle, i;
 
     while (true)
     {
         g_intrsect.is_direct_changed = false;
-        memset(g_intrsect.is_way_checked, false, MAX_WAY_COUNT * sizeof(bool));
+        memset(g_intrsect.is_way_finish, false, MAX_WAY_COUNT * sizeof(bool));
 
-        // Get vehicle from queue and put it on the way
-        if (!q_is_empty(&g_vhcle_q))
-        {
-            way = q_deq(&g_vhcle_q);
-            q_enq(&g_way_q[way - 1], way);
-        }
+        // Enqueue vehicle number to way queue
+        set_vhcle_ready();
 
         // Send signal to way which is send vehicle to the intersection
         pthread_cond_broadcast(&g_tf_cond);
 
         // Wait for all way thread is checked
-        while (true)
-        {
-            is_all_way_checked = true;
-            for (i = 0; i < MAX_WAY_COUNT; i++)
-                if (!g_intrsect.is_way_checked[i])
-                {
-                    is_all_way_checked = false;
-                    break;
-                }
-
-            if (is_all_way_checked)
-                break;
-        }
+        wait_ways_finish();
 
         // Check vehicle is passed
         passed_vhcle = 0;
@@ -279,11 +262,48 @@ void *t_intrsect(void *arg)
         print_intrsect(passed_vhcle);
 
         // Loop exit trigger
-        if (is_finished())
+        if (is_intrsect_finish())
             break;
     }
     print_intrsect(0);
     return NULL;
+}
+
+/**
+ * @brief Set vehicle ready to way queue
+ */
+void set_vhcle_ready(void)
+{
+    uint8_t way;
+
+    if (!q_is_empty(&g_vhcle_q))
+    {
+        way = q_deq(&g_vhcle_q);
+        q_enq(&g_way_q[way - 1], way);
+    }
+}
+
+/**
+ * @brief Wait for all way thread is checked
+ */
+void wait_ways_finish(void)
+{
+    uint8_t i;
+    bool is_all_way_finish;
+
+    while (true)
+    {
+        is_all_way_finish = true;
+        for (i = 0; i < MAX_WAY_COUNT; i++)
+            if (!g_intrsect.is_way_finish[i])
+            {
+                is_all_way_finish = false;
+                break;
+            }
+
+        if (is_all_way_finish)
+            break;
+    }
 }
 
 /**
@@ -302,7 +322,7 @@ void *t_way(void *arg)
         // Check ready vehicle is exist and no running same way
         if (!q_is_empty(&g_way_q[way - 1]) && !is_vhcle_running(way))
         {
-            // No running 
+            // No running
             if (g_intrsect.direction == DIRECTION_EMPTY)
             {
                 g_intrsect.direction = way % 2;
@@ -329,7 +349,7 @@ void *t_way(void *arg)
             }
         }
 
-        g_intrsect.is_way_checked[way - 1] = true;
+        g_intrsect.is_way_finish[way - 1] = true;
 
         // Unlock pthread mutex
         pthread_mutex_unlock(&g_mutex);
@@ -342,7 +362,7 @@ void *t_way(void *arg)
  * @return true Finished
  * @return false Not finished
  */
-bool is_finished(void)
+bool is_intrsect_finish(void)
 {
     uint8_t i;
 
