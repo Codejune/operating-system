@@ -287,32 +287,25 @@ void *t_intrsect(void *arg)
         printf("\n==========================\n");
 
         // Loop exit trigger
-        if (!q_is_empty(&g_vhcle_q))
-            continue;
-
-        for (i = 0; i < MAX_WAY_COUNT; i++)
-            if (!q_is_empty(&g_way_q[i]))
-                is_all_q_empty = false;
-
-        if (!is_all_q_empty)
-            continue;
+        if (is_finished())
+            break;
 
         // Last check vehicle is passed
-        for (i = 0; i < 2; i++)
-        {
-            if (g_intrsect.is_running[i])
-            {
-                g_intrsect.passing[i][1]--;
-                if (g_intrsect.passing[i][1] == 0)
-                {
-                    passed = g_intrsect.passing[i][0];
-                    g_intrsect.passing[i][0] = 0;
-                    g_intrsect.is_running[i] = false;
-                    g_passed_vhcle[passed - 1]++;
-                }
-            }
-        }
-        break;
+        // for (i = 0; i < 2; i++)
+        // {
+        //     if (g_intrsect.is_running[i])
+        //     {
+        //         g_intrsect.passing[i][1]--;
+        //         if (g_intrsect.passing[i][1] == 0)
+        //         {
+        //             passed = g_intrsect.passing[i][0];
+        //             g_intrsect.passing[i][0] = 0;
+        //             g_intrsect.is_running[i] = false;
+        //             g_passed_vhcle[passed - 1]++;
+        //         }
+        //     }
+        // }
+        // break;
     }
     return NULL;
 }
@@ -377,4 +370,29 @@ void *t_way(void *arg)
         pthread_mutex_unlock(&g_mutex);
     }
     return NULL;
+}
+
+/**
+ * @brief Check is process finished
+ * @return true Finished
+ * @return false Not finished
+ */
+bool is_finished(void)
+{
+    uint8_t i;
+
+    // Check intersection is clear
+    if (g_intrsect.traffic_type != TRAFFIC_TYPE_NO_RUNNING)
+        return false;
+
+    // Check all vehicle is ready
+    if (!q_is_empty(&g_vhcle_q))
+        return false;
+
+    // Check all vehicle is passed
+    for (i = 0; i < MAX_WAY_COUNT; i++)
+        if (!q_is_empty(&g_way_q[i]))
+            return false;
+
+    return true;
 }
