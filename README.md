@@ -63,7 +63,7 @@ make
 ### 예시
 
 ``` bash
-./intersection 
+$ ./intersection
 Start point: 4 4 3 4 1 2 2 3 3 3 
 tick: 1
 ==========================
@@ -133,44 +133,51 @@ tick: 10
 Passed Vehicle
 Car 
 Waiting Vehicle
-Car 1 3 3 
+Car 3 3 3 
 ==========================
 tick: 11
 ==========================
 Passed Vehicle
-Car 3
+Car 1
 Waiting Vehicle
 Car 3 3 
 ==========================
 tick: 12
 ==========================
 Passed Vehicle
-Car 1
+Car 3
 Waiting Vehicle
-Car 3 
+Car 3 3 
 ==========================
 tick: 13
 ==========================
 Passed Vehicle
-Car 3
+Car 
 Waiting Vehicle
 Car 3 
 ==========================
 tick: 14
 ==========================
 Passed Vehicle
+Car 3
+Waiting Vehicle
+Car 3 
+==========================
+tick: 15
+==========================
+Passed Vehicle
 Car 
 Waiting Vehicle
 Car 
 ==========================
-tick: 15
+tick: 16
 ==========================
 Passed Vehicle
 Car 3
 Waiting Vehicle
 Car 
 ==========================
-tick: 16
+tick: 17
 ==========================
 Passed Vehicle
 Car 
@@ -182,5 +189,5 @@ P1: 1 times
 P2: 2 times
 P3: 4 times
 P4: 3 times
-Total time: 16 ticks
+Total time: 17 ticks
 ```

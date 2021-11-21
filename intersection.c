@@ -132,7 +132,7 @@ void init_way_q(void)
 
     g_way_q = (queue_t *)malloc(sizeof(queue_t) * g_vhcle_cnt);
 
-    for (i = 0; i < g_vhcle_cnt; i++)
+    for (i = 0; i < MAX_WAY_COUNT; i++)
         g_way_q[i].front = g_way_q[i].rear = 0;
 }
 
@@ -168,8 +168,8 @@ void q_enq(queue_t *q, uint8_t data)
         fprintf(stderr, "Queue is full\n");
         exit(EXIT_FAILURE);
     }
-    q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
     q->data[q->rear] = data;
+    q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
 }
 
 /**
@@ -179,13 +179,16 @@ void q_enq(queue_t *q, uint8_t data)
  */
 uint8_t q_deq(queue_t *q)
 {
+    uint8_t data;
+
     if (q_is_empty(q))
     {
         fprintf(stderr, "Queue is empty\n");
         exit(EXIT_FAILURE);
     }
+    data = q->data[q->front];
     q->front = (q->front + 1) % MAX_QUEUE_SIZE;
-    return q->data[q->front];
+    return data;
 }
 
 /**
@@ -198,15 +201,8 @@ void q_print(void)
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
         printf("Way queue[%hhd]: ", i + 1);
-        if (!q_is_empty(&g_way_q[i]))
-        {
-            j = g_way_q[i].front;
-            do
-            {
-                j = (j + 1) % MAX_QUEUE_SIZE;
-                printf("%hhd ", g_way_q[i].data[j]);
-            } while (j == g_way_q[i].rear - 1);
-        }
+        for (j = 0; j < MAX_QUEUE_SIZE; j++)
+            printf("%hhd ", g_way_q[i].data[j]);
         printf("\n");
     }
 }
@@ -217,9 +213,9 @@ void q_print(void)
  */
 void *t_intrsect(void *arg)
 {
-    uint8_t passed_vhcle, i;
+    uint8_t passed_vhcle, passed_cnt[MAX_WAY_COUNT] = {0}, i;
 
-    while (true)
+    while (!is_intrsect_finish())
     {
         g_intrsect.is_direct_changed = false;
         memset(g_intrsect.is_way_finish, false, MAX_WAY_COUNT * sizeof(bool));
@@ -233,7 +229,7 @@ void *t_intrsect(void *arg)
         // Wait for all way thread is checked
         wait_ways_finish();
 
-        // Check vehicle is passed
+        // Get passed vehicle
         passed_vhcle = 0;
         for (i = 0; i < 2; i++)
         {
@@ -245,27 +241,24 @@ void *t_intrsect(void *arg)
                     passed_vhcle = g_intrsect.passing[i][0];
                     g_intrsect.passing[i][0] = 0;
                     g_intrsect.is_way_running[i] = false;
-                    g_passed_vhcle[passed_vhcle - 1]++;
+                    passed_cnt[passed_vhcle - 1]++;
                 }
             }
         }
 
-        // Update traffic direction
+        // Update traffic direction if traffic is clear
         if (!g_intrsect.is_way_running[0] && !g_intrsect.is_way_running[1])
             g_intrsect.direction = DIRECTION_EMPTY;
 
+        // Print passing information
         print_intrsect(passed_vhcle);
-
-        // Loop exit trigger
-        if (is_intrsect_finish())
-            break;
     }
 
     print_intrsect(0);
 
     printf("Number of vehicles passed from each start point\n");
     for (i = 0; i < MAX_WAY_COUNT; i++)
-        printf("P%d: %d times\n", i + 1, g_passed_vhcle[i]);
+        printf("P%d: %d times\n", i + 1, passed_cnt[i]);
     printf("Total time: %hhd ticks\n", g_total_ticks);
 
     return NULL;
@@ -291,19 +284,19 @@ void set_vhcle_ready(void)
 void wait_ways_finish(void)
 {
     uint8_t i;
-    bool is_all_way_finish;
+    bool is_finish;
 
     while (true)
     {
-        is_all_way_finish = true;
+        is_finish = true;
         for (i = 0; i < MAX_WAY_COUNT; i++)
             if (!g_intrsect.is_way_finish[i])
             {
-                is_all_way_finish = false;
+                is_finish = false;
                 break;
             }
 
-        if (is_all_way_finish)
+        if (is_finish)
             break;
     }
 }
@@ -334,7 +327,7 @@ void *t_way(void *arg)
                 g_intrsect.is_direct_changed = true;
             }
             // Same direction
-            else if (g_intrsect.direction == (way % 2))
+            else if (g_intrsect.direction == (way % 2) && !g_intrsect.is_direct_changed)
             {
                 if (!g_intrsect.is_way_running[0] && !g_intrsect.is_direct_changed)
                 {
@@ -416,9 +409,9 @@ void print_intrsect(uint8_t passed_vhcle)
             j = g_way_q[i].front;
             do
             {
-                j = (j + 1) % MAX_QUEUE_SIZE;
                 printf("%hhd ", g_way_q[i].data[j]);
-            } while (j == g_way_q[i].rear - 1);
+                j = (j + 1) % MAX_QUEUE_SIZE;
+            } while (j != g_way_q[i].rear);
         }
     printf("\n==========================\n");
 }

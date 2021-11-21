@@ -21,7 +21,7 @@
 #define MAX_VHCLE_COUNT 50             // Maximal vehicle count
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
-// #define DEBUG 1                        // Debug mode
+#define DEBUG 1                        // Debug mode
 
 // Structure
 /**
@@ -39,7 +39,7 @@ typedef enum directon_t
  */
 typedef struct queue_t
 {
-    uint8_t data[MAX_VHCLE_COUNT]; // Queue data
+    uint8_t data[MAX_QUEUE_SIZE]; // Queue data
     uint8_t front;                 // Head index
     uint8_t rear;                  // Tail index
 } queue_t;
@@ -63,7 +63,6 @@ uint8_t g_vhcle_cnt;                                 // Vehicle count
 queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
-uint8_t g_passed_vhcle[MAX_WAY_COUNT] = {0};         // Passed vehicle
 uint8_t g_total_ticks = 0;                           // Tick count
 
 // Function prototype
