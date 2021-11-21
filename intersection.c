@@ -75,7 +75,7 @@ int main(void)
  */
 void init_intrsect(void)
 {
-    g_intrsect.traffic_type = TRAFFIC_NO_RUNNING;
+    g_intrsect.direction = DIRECTION_EMPTY;
     memset(g_intrsect.is_running, false, 2 * sizeof(bool));
 }
 
@@ -214,15 +214,17 @@ void q_print(void)
  */
 void *t_intrsect(void *arg)
 {
-    uint8_t way, passed, i, j;
+    uint8_t way, passed_vhcle, i;
     bool is_all_way_checked;
 
     // Traffic signal routine
     while (true)
     {
         // Initialize status variables
-        passed = 0;
+        is_all_way_checked = false;
+        g_intrsect.is_direct_changed = false;
         memset(g_intrsect.is_way_checked, false, MAX_WAY_COUNT * sizeof(bool));
+        passed_vhcle = 0;
 
         // Get vehicle from queue and put it on the way
         pthread_mutex_lock(&g_mutex);
@@ -237,7 +239,6 @@ void *t_intrsect(void *arg)
         pthread_cond_broadcast(&g_tf_cond);
 
         // Wait for all way thread is checked
-        is_all_way_checked = false;
         while (!is_all_way_checked)
         {
             for (i = 0; i < MAX_WAY_COUNT; i++)
@@ -246,7 +247,7 @@ void *t_intrsect(void *arg)
                     is_all_way_checked = true;
                     break;
                 }
-            usleep(1 * SECOND_TO_MICRO);
+            usleep(0.5 * SECOND_TO_MICRO);
         }
 
         // Check vehicle is passed
@@ -257,18 +258,18 @@ void *t_intrsect(void *arg)
                 g_intrsect.passing[i][1]--;
                 if (g_intrsect.passing[i][1] == 0)
                 {
-                    passed = g_intrsect.passing[i][0];
+                    passed_vhcle = g_intrsect.passing[i][0];
                     g_intrsect.passing[i][0] = 0;
                     g_intrsect.is_running[i] = false;
-                    g_passed_vhcle[passed - 1]++;
+                    g_passed_vhcle[passed_vhcle - 1]++;
                 }
             }
         }
 
         if (!g_intrsect.is_running[0] && !g_intrsect.is_running[1])
-            g_intrsect.traffic_type = TRAFFIC_NO_RUNNING;
+            g_intrsect.direction = DIRECTION_EMPTY;
 
-        print_intrsect(passed);
+        print_intrsect(passed_vhcle);
 
         // Loop exit trigger
         if (is_finished())
@@ -302,29 +303,27 @@ void *t_way(void *arg)
                 continue;
             }
 
-            // Set vehicle to passing status
-            // Traffic type is not running
-            if (g_intrsect.traffic_type == TRAFFIC_NO_RUNNING)
+            if (g_intrsect.direction == DIRECTION_EMPTY)
             {
-                g_intrsect.traffic_type = way % 2;
+                g_intrsect.direction = way % 2;
                 g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                 g_intrsect.passing[0][1] = 2;
                 g_intrsect.is_running[0] = true;
+                g_intrsect.is_direct_changed = true;
             }
             // Traffic type is matched
-            else if (g_intrsect.traffic_type == (way % 2))
+            else if (g_intrsect.direction == (way % 2))
             {
+
                 // Road is not full and there is no same start way
-                if (!g_intrsect.is_running[0])
+                if (!g_intrsect.is_running[0] && !g_intrsect.is_direct_changed)
                 {
-                    g_intrsect.traffic_type = way % 2;
                     g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[0][1] = 2;
                     g_intrsect.is_running[0] = true;
                 }
-                else
+                else if (!g_intrsect.is_running[1] && !g_intrsect.is_direct_changed)
                 {
-                    g_intrsect.traffic_type = way % 2;
                     g_intrsect.passing[1][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[1][1] = 2;
                     g_intrsect.is_running[1] = true;
@@ -350,7 +349,7 @@ bool is_finished(void)
     uint8_t i;
 
     // Check intersection is clear
-    if (g_intrsect.traffic_type != TRAFFIC_NO_RUNNING)
+    if (g_intrsect.direction != DIRECTION_EMPTY)
         return false;
 
     // Check all vehicle is ready
@@ -367,7 +366,7 @@ bool is_finished(void)
 
 /**
  * @brief Print intersection information
- * @param passed 
+ * @param passed
  */
 void print_intrsect(uint8_t passed)
 {

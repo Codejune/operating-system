@@ -26,12 +26,12 @@
 /**
  * @brief Traffic type enumeration
  */
-typedef enum traffic_t
+typedef enum directon_t
 {
-    TRAFFIC_HORIZONTAL = 0, // P2, P4
-    TRAFFIC_VERTICAL = 1,   // P1, P3
-    TRAFFIC_NO_RUNNING = 2, // Not running
-} traffic_t;
+    DIRECTION_HORIZONTAL = 0, // P2, P4
+    DIRECTION_VERTICAL = 1,   // P1, P3
+    DIRECTION_EMPTY = 2,      // Not running
+} directon_t;
 
 /**
  * @brief Cycle queue structure
@@ -49,9 +49,10 @@ typedef struct queue_t
 typedef struct intrsect_t
 {
     uint8_t passing[2][2];              // Passing road, left time of passing
-    enum traffic_t traffic_type;        // Traffic type
+    enum directon_t direction;          // Traffic direction
+    bool is_direct_changed;             // Direction changed
     bool is_running[2];                 // Way status
-    bool is_way_checked[MAX_WAY_COUNT]; // Way checked status
+    bool is_way_checked[MAX_WAY_COUNT]; // Way thread checked status
 } intrsect_t;
 
 // Global Variable
@@ -62,7 +63,7 @@ queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
 uint8_t g_passed_vhcle[MAX_WAY_COUNT] = {0};         // Passed vehicle
-uint8_t g_total_ticks = 0;
+uint8_t g_total_ticks = 0;                           // Tick count
 
 // Function prototype
 void init_intrsect(void);
