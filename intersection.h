@@ -28,9 +28,9 @@
  */
 typedef enum traffic_t
 {
-    TRAFFIC_TYPE_HORIZONTAL = 0, // P2, P4
-    TRAFFIC_TYPE_VERTICAL = 1,   // P1, P3
-    TRAFFIC_TYPE_NO_RUNNING = 2, // Not running
+    TRAFFIC_HORIZONTAL = 0, // P2, P4
+    TRAFFIC_VERTICAL = 1,   // P1, P3
+    TRAFFIC_NO_RUNNING = 2, // Not running
 } traffic_t;
 
 /**

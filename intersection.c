@@ -75,7 +75,7 @@ int main(void)
  */
 void init_intrsect(void)
 {
-    g_intrsect.traffic_type = TRAFFIC_TYPE_NO_RUNNING;
+    g_intrsect.traffic_type = TRAFFIC_NO_RUNNING;
     memset(g_intrsect.is_running, false, 2 * sizeof(bool));
 }
 
@@ -267,7 +267,7 @@ void *t_intrsect(void *arg)
         }
 
         if (!g_intrsect.is_running[0] && !g_intrsect.is_running[1])
-            g_intrsect.traffic_type = TRAFFIC_TYPE_NO_RUNNING;
+            g_intrsect.traffic_type = TRAFFIC_NO_RUNNING;
 
         // Print tick information
         printf("tick: %hhd\n==========================\nPassed Vehicle\nCar ", ++g_total_ticks);
@@ -336,7 +336,7 @@ void *t_way(void *arg)
 
             // Set vehicle to passing status
             // Traffic type is not running
-            if (g_intrsect.traffic_type == TRAFFIC_TYPE_NO_RUNNING)
+            if (g_intrsect.traffic_type == TRAFFIC_NO_RUNNING)
             {
                 g_intrsect.traffic_type = way % 2;
                 g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
@@ -382,7 +382,7 @@ bool is_finished(void)
     uint8_t i;
 
     // Check intersection is clear
-    if (g_intrsect.traffic_type != TRAFFIC_TYPE_NO_RUNNING)
+    if (g_intrsect.traffic_type != TRAFFIC_NO_RUNNING)
         return false;
 
     // Check all vehicle is ready
