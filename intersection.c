@@ -49,11 +49,6 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    printf("Number of vehicles passed from each start point\n");
-    for (i = 0; i < MAX_WAY_COUNT; i++)
-        printf("P%d: %d times\n", i + 1, g_passed_vhcle[i]);
-    printf("Total time: %hhd ticks\n", g_total_ticks);
-
     // Destroy all way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
         if ((ret = pthread_cancel(way_tid[i][0])) != 0)
@@ -103,7 +98,7 @@ void init_vhcle_q(void)
     printf("Total number of vehicles: ");
     scanf("%hhd", &g_vhcle_cnt);
 
-    if (g_vhcle_cnt > MAX_VHCLE_COUNT)
+    if (g_vhcle_cnt >= MAX_VHCLE_COUNT)
     {
         fprintf(stderr, "Out of maximum vehicle count\n");
         exit(EXIT_FAILURE);
@@ -265,7 +260,14 @@ void *t_intrsect(void *arg)
         if (is_intrsect_finish())
             break;
     }
+
     print_intrsect(0);
+
+    printf("Number of vehicles passed from each start point\n");
+    for (i = 0; i < MAX_WAY_COUNT; i++)
+        printf("P%d: %d times\n", i + 1, g_passed_vhcle[i]);
+    printf("Total time: %hhd ticks\n", g_total_ticks);
+
     return NULL;
 }
 

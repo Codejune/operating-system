@@ -18,7 +18,7 @@
 
 // Macro
 #define SECOND_TO_MICRO 1000000
-#define MAX_VHCLE_COUNT 16             // Maximal vehicle count
+#define MAX_VHCLE_COUNT 50             // Maximal vehicle count
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
 // #define DEBUG 1                        // Debug mode
