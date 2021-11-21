@@ -133,19 +133,19 @@ tick: 10
 Passed Vehicle
 Car 
 Waiting Vehicle
-Car 3 3 
+Car 1 3 3 
 ==========================
 tick: 11
 ==========================
 Passed Vehicle
-Car 1
+Car 3
 Waiting Vehicle
 Car 3 3 
 ==========================
 tick: 12
 ==========================
 Passed Vehicle
-Car 
+Car 1
 Waiting Vehicle
 Car 3 
 ==========================
@@ -163,10 +163,24 @@ Car
 Waiting Vehicle
 Car 
 ==========================
+tick: 15
+==========================
+Passed Vehicle
+Car 3
+Waiting Vehicle
+Car 
+==========================
+tick: 16
+==========================
+Passed Vehicle
+Car 
+Waiting Vehicle
+Car 
+==========================
 Number of vehicles passed from each start point
 P1: 1 times
 P2: 2 times
 P3: 4 times
 P4: 3 times
-Total time: 14 ticks
+Total time: 16 ticks
 ```
