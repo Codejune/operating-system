@@ -76,4 +76,5 @@ void q_print(void);
 void *t_intrsect(void *arg);
 void *t_way(void *arg);
 bool is_finished(void);
+void print_intrsect(uint8_t passed);
 #endif

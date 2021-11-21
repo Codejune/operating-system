@@ -215,13 +215,12 @@ void q_print(void)
 void *t_intrsect(void *arg)
 {
     uint8_t way, passed, i, j;
-    bool is_not_checked, is_all_q_empty;
+    bool is_all_way_checked;
 
     // Traffic signal routine
     while (true)
     {
         // Initialize status variables
-        is_all_q_empty = true;
         passed = 0;
         memset(g_intrsect.is_way_checked, false, MAX_WAY_COUNT * sizeof(bool));
 
@@ -238,13 +237,13 @@ void *t_intrsect(void *arg)
         pthread_cond_broadcast(&g_tf_cond);
 
         // Wait for all way thread is checked
-        is_not_checked = false;
-        while (!is_not_checked)
+        is_all_way_checked = false;
+        while (!is_all_way_checked)
         {
             for (i = 0; i < MAX_WAY_COUNT; i++)
                 if (g_intrsect.is_way_checked[i] == false)
                 {
-                    is_not_checked = true;
+                    is_all_way_checked = true;
                     break;
                 }
             usleep(1 * SECOND_TO_MICRO);
@@ -269,44 +268,13 @@ void *t_intrsect(void *arg)
         if (!g_intrsect.is_running[0] && !g_intrsect.is_running[1])
             g_intrsect.traffic_type = TRAFFIC_NO_RUNNING;
 
-        // Print tick information
-        printf("tick: %hhd\n==========================\nPassed Vehicle\nCar ", ++g_total_ticks);
-        if (passed > 0)
-            printf("%hhd", passed);
-        printf("\nWaiting Vehicle\nCar ");
-        for (i = 0; i < MAX_WAY_COUNT; i++)
-            if (!q_is_empty(&g_way_q[i]))
-            {
-                j = g_way_q[i].front;
-                do
-                {
-                    j = (j + 1) % MAX_QUEUE_SIZE;
-                    printf("%hhd ", g_way_q[i].data[j]);
-                } while (j == g_way_q[i].rear - 1);
-            }
-        printf("\n==========================\n");
+        print_intrsect(passed);
 
         // Loop exit trigger
         if (is_finished())
             break;
-
-        // Last check vehicle is passed
-        // for (i = 0; i < 2; i++)
-        // {
-        //     if (g_intrsect.is_running[i])
-        //     {
-        //         g_intrsect.passing[i][1]--;
-        //         if (g_intrsect.passing[i][1] == 0)
-        //         {
-        //             passed = g_intrsect.passing[i][0];
-        //             g_intrsect.passing[i][0] = 0;
-        //             g_intrsect.is_running[i] = false;
-        //             g_passed_vhcle[passed - 1]++;
-        //         }
-        //     }
-        // }
-        // break;
     }
+    print_intrsect(0);
     return NULL;
 }
 
@@ -395,4 +363,32 @@ bool is_finished(void)
             return false;
 
     return true;
+}
+
+/**
+ * @brief Print intersection information
+ * @param passed 
+ */
+void print_intrsect(uint8_t passed)
+{
+    uint8_t i, j;
+    printf("tick: %hhd\n", ++g_total_ticks);
+    printf("==========================\n");
+    printf("Passed Vehicle\n");
+    printf("Car ");
+    if (passed != 0)
+        printf("%hhd", passed);
+    printf("\nWaiting Vehicle\n");
+    printf("Car ");
+    for (i = 0; i < MAX_WAY_COUNT; i++)
+        if (!q_is_empty(&g_way_q[i]))
+        {
+            j = g_way_q[i].front;
+            do
+            {
+                j = (j + 1) % MAX_QUEUE_SIZE;
+                printf("%hhd ", g_way_q[i].data[j]);
+            } while (j == g_way_q[i].rear - 1);
+        }
+    printf("\n==========================\n");
 }
