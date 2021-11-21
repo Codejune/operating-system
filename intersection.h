@@ -21,17 +21,17 @@
 #define MAX_VHCLE_COUNT 16             // Maximal vehicle count
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
-// #define DEBUG 1                        // Debug mode
+#define DEBUG 1                        // Debug mode
 // Structure
 /**
  * @brief Traffic type enumeration
  */
-typedef enum traffic_t
+typedef enum directon_t
 {
-    TRAFFIC_TYPE_HORIZONTAL = 0, // P2, P4
-    TRAFFIC_TYPE_VERTICAL = 1,   // P1, P3
-    TRAFFIC_TYPE_NO_RUNNING = 2, // Not running
-} traffic_t;
+    DIRECTION_HORIZONTAL = 0, // P2, P4
+    DIRECTION_VERTICAL = 1,   // P1, P3
+    DIRECTION_EMPTY = 2,      // Not running
+} directon_t;
 
 /**
  * @brief Cycle queue structure
@@ -48,10 +48,11 @@ typedef struct queue_t
  */
 typedef struct intrsect_t
 {
-    uint8_t passing[2][2];              // Passing road, left time of passing
-    enum traffic_t traffic_type;        // Traffic type
-    bool is_running[2];                 // Way status
-    bool is_way_checked[MAX_WAY_COUNT]; // Way checked status
+    uint8_t passing[2][2];              // [Passing road][Left time]
+    enum directon_t direction;          // Traffic direction
+    bool is_direct_changed;             // Direction changed
+    bool is_way_running[2];             // Way status
+    bool is_way_checked[MAX_WAY_COUNT]; // Way thread checked status
 } intrsect_t;
 
 // Global Variable
@@ -62,7 +63,7 @@ queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
 uint8_t g_passed_vhcle[MAX_WAY_COUNT] = {0};         // Passed vehicle
-uint8_t g_total_ticks = 0;
+uint8_t g_total_ticks = 0;                           // Tick count
 
 // Function prototype
 void init_intrsect(void);
@@ -75,4 +76,7 @@ uint8_t q_deq(queue_t *q);
 void q_print(void);
 void *t_intrsect(void *arg);
 void *t_way(void *arg);
+bool is_finished(void);
+bool is_vhcle_running(uint8_t way);
+void print_intrsect(uint8_t passed_vhcle);
 #endif
