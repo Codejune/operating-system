@@ -77,5 +77,6 @@ void q_print(void);
 void *t_intrsect(void *arg);
 void *t_way(void *arg);
 bool is_finished(void);
-void print_intrsect(uint8_t passed);
+bool is_vhcle_running(uint8_t way);
+void print_intrsect(uint8_t passed_vhcle);
 #endif
