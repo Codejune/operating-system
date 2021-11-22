@@ -13,7 +13,7 @@ int main(void)
 {
     pthread_t way_tid[MAX_WAY_COUNT][2];
     pthread_t intrsect_tid;
-    uint8_t i, ret;
+    uint8_t i;
 
     // Initialize intersection
     init_intrsect();
@@ -28,7 +28,7 @@ int main(void)
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
         way_tid[i][1] = i + 1;
-        if ((pthread_create(&(way_tid[i][0]), NULL, &t_way, (void *)&(way_tid[i][1]))) != 0)
+        if (pthread_create(&way_tid[i][0], NULL, &t_way, (void *)&way_tid[i][1]) != 0)
         {
             fprintf(stderr, "pthread_create() error\n");
             exit(EXIT_FAILURE);
@@ -36,14 +36,14 @@ int main(void)
     }
 
     // Generate intersection thread
-    if ((ret = pthread_create(&intrsect_tid, NULL, &t_intrsect, NULL)) != 0)
+    if (pthread_create(&intrsect_tid, NULL, &t_intrsect, NULL) != 0)
     {
         fprintf(stderr, "pthread_create() error\n");
         exit(EXIT_FAILURE);
     }
 
     // Wait for traffic is done
-    if ((ret = pthread_join(intrsect_tid, NULL)) != 0)
+    if (pthread_join(intrsect_tid, NULL) != 0)
     {
         fprintf(stderr, "pthread_join() error\n");
         exit(EXIT_FAILURE);
@@ -51,7 +51,7 @@ int main(void)
 
     // Destroy all way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
-        if ((ret = pthread_cancel(way_tid[i][0])) != 0)
+        if (pthread_cancel(way_tid[i][0]) != 0)
         {
             fprintf(stderr, "pthread_cancel() error\n");
             exit(EXIT_FAILURE);
@@ -329,13 +329,13 @@ void *t_way(void *arg)
             // Same direction
             else if (g_intrsect.direction == (way % 2) && !g_intrsect.is_direct_changed)
             {
-                if (!g_intrsect.is_way_running[0] && !g_intrsect.is_direct_changed)
+                if (!g_intrsect.is_way_running[0])
                 {
                     g_intrsect.passing[0][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[0][1] = 2;
                     g_intrsect.is_way_running[0] = true;
                 }
-                else if (!g_intrsect.is_way_running[1] && !g_intrsect.is_direct_changed)
+                else if (!g_intrsect.is_way_running[1])
                 {
                     g_intrsect.passing[1][0] = q_deq(&g_way_q[way - 1]);
                     g_intrsect.passing[1][1] = 2;
