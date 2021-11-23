@@ -200,7 +200,7 @@ void q_print(void)
 
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
-        printf("Way queue[%hhd]: ", i + 1);
+        printf("Way queue[%d]: ", i + 1);
         for (j = 0; j < MAX_QUEUE_SIZE; j++)
             printf("%hhd ", g_way_q[i].data[j]);
         printf("\n");
@@ -211,7 +211,7 @@ void q_print(void)
  * @brief Intersection thread function which is managing traffic
  * @return void* NULL
  */
-void *t_intrsect(void *arg)
+void *t_intrsect(__attribute__((unused)) void *arg)
 {
     uint8_t passed_vhcle, passed_cnt[MAX_WAY_COUNT] = {0}, i;
 
