@@ -27,7 +27,7 @@ int main(void)
     // Generate way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
-        way_tid[i][1] = i + 1;
+        way_tid[i][1] = (pthread_t)i + 1;
         if (pthread_create(&way_tid[i][0], NULL, &t_way, (void *)&way_tid[i][1]) != 0)
         {
             fprintf(stderr, "pthread_create() error\n");
