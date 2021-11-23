@@ -11,8 +11,9 @@
  */
 int main(void)
 {
-    pthread_t way_tid[MAX_WAY_COUNT][2];
+    pthread_t way_tid[MAX_WAY_COUNT];
     pthread_t intrsect_tid;
+    uint8_t way_number[MAX_WAY_COUNT];
     uint8_t i;
 
     // Initialize intersection
@@ -27,8 +28,8 @@ int main(void)
     // Generate way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
     {
-        way_tid[i][1] = (pthread_t)i + 1;
-        if (pthread_create(&way_tid[i][0], NULL, &t_way, (void *)&way_tid[i][1]) != 0)
+        way_number[i] = (pthread_t)i + 1;
+        if (pthread_create(&way_tid[i], NULL, &t_way, (void *)&way_number[i]) != 0)
         {
             fprintf(stderr, "pthread_create() error\n");
             exit(EXIT_FAILURE);
@@ -51,7 +52,7 @@ int main(void)
 
     // Destroy all way thread
     for (i = 0; i < MAX_WAY_COUNT; i++)
-        if (pthread_cancel(way_tid[i][0]) != 0)
+        if (pthread_cancel(way_tid[i]) != 0)
         {
             fprintf(stderr, "pthread_cancel() error\n");
             exit(EXIT_FAILURE);
