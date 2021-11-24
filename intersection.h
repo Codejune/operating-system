@@ -18,7 +18,7 @@
 
 // Macro
 #define SECOND_TO_MICRO 1000000
-#define MAX_VHCLE_COUNT 50             // Maximal vehicle count
+#define MAX_VHCLE_COUNT 100             // Maximal vehicle count
 #define MAX_WAY_COUNT 4                // Maximal way count
 #define MAX_QUEUE_SIZE MAX_VHCLE_COUNT // Maximal queue size
 // #define DEBUG 1                        // Debug mode
@@ -59,11 +59,11 @@ typedef struct intrsect_t
 // Global Variable
 pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex lock variable
 pthread_cond_t g_tf_cond = PTHREAD_COND_INITIALIZER; // Traffic Signal condition variable
-uint8_t g_vhcle_cnt;                                 // Vehicle count
+volatile uint8_t g_vhcle_cnt;                                 // Vehicle count
 queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
-uint8_t g_total_ticks = 0;                           // Tick count
+volatile uint8_t g_total_ticks = 0;                           // Tick count
 
 // Function prototype
 void init_intrsect(void);

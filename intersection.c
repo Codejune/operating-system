@@ -11,10 +11,8 @@
  */
 int main(void)
 {
-    pthread_t way_tid[MAX_WAY_COUNT];
-    pthread_t intrsect_tid;
-    uint8_t way_number[MAX_WAY_COUNT];
-    uint8_t i;
+    pthread_t intrsect_tid, way_tid[MAX_WAY_COUNT];
+    uint8_t way_number[MAX_WAY_COUNT], i;
 
     // Initialize intersection
     init_intrsect();
@@ -313,6 +311,10 @@ void *t_way(void *arg)
 
     while (true)
     {
+        // Reset pthread mutex status
+        pthread_mutex_unlock(&g_mutex);
+
+        // Wait for signal
         pthread_cond_wait(&g_tf_cond, &g_mutex);
 
         // Check ready vehicle is exist and no running same way
@@ -347,7 +349,7 @@ void *t_way(void *arg)
 
         g_intrsect.is_way_finish[way - 1] = true;
 
-        // Unlock pthread mutex
+        // Reset pthread mutex status
         pthread_mutex_unlock(&g_mutex);
     }
     return NULL;
