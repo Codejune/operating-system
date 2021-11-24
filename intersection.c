@@ -13,6 +13,7 @@ int main(void)
 {
     pthread_t intrsect_tid, way_tid[MAX_WAY_COUNT];
     uint8_t way_number[MAX_WAY_COUNT], i;
+    bool is_created;
 
     // Initialize intersection
     init_intrsect();
@@ -32,6 +33,21 @@ int main(void)
             fprintf(stderr, "pthread_create() error\n");
             exit(EXIT_FAILURE);
         }
+    }
+
+    // Wait for all way thread to created
+    while (true)
+    {
+        usleep(0.1 * SECOND_TO_MICRO);
+        is_created = true;
+        for (i = 0; i < MAX_WAY_COUNT; i++)
+            if (!g_way_status[i])
+            {
+                is_created = false;
+                break;
+            }
+        if (is_created)
+            break;
     }
 
     // Generate intersection thread
@@ -287,6 +303,7 @@ void wait_ways_finish(void)
 
     while (true)
     {
+        // usleep(0.1 * SECOND_TO_MICRO);
         is_finish = true;
         for (i = 0; i < MAX_WAY_COUNT; i++)
             if (!g_intrsect.is_way_finish[i])
@@ -308,6 +325,7 @@ void wait_ways_finish(void)
 void *t_way(void *arg)
 {
     uint8_t way = *((int *)arg);
+    g_way_status[way - 1] = true;
 
     while (true)
     {
