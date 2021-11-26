@@ -64,7 +64,7 @@ queue_t g_vhcle_q;                                   // Vehicle queue
 queue_t *g_way_q;                                    // Way queue list
 intrsect_t g_intrsect;                               // Intersection structure
 bool g_way_status[MAX_WAY_COUNT] = {false};          // Way thread running status
-volatile uint8_t g_total_ticks = 0;                  // Tick count
+volatile uint16_t g_total_ticks = 0;                  // Tick count
 
 // Function prototype
 void init_intrsect(void);
