@@ -274,7 +274,7 @@ void *t_intrsect(__attribute__((unused)) void *arg)
     printf("Number of vehicles passed from each start point\n");
     for (i = 0; i < MAX_WAY_COUNT; i++)
         printf("P%d: %d times\n", i + 1, passed_cnt[i]);
-    printf("Total time: %hhd ticks\n", g_total_ticks);
+    printf("Total time: %hu ticks\n", g_total_ticks);
 
     return NULL;
 }
@@ -416,7 +416,7 @@ bool is_vhcle_running(uint8_t way)
 void print_intrsect(uint8_t passed_vhcle)
 {
     uint8_t i, j;
-    printf("tick: %hhd\n", ++g_total_ticks);
+    printf("tick: %hu\n", ++g_total_ticks);
     printf("==========================\n");
     printf("Passed Vehicle\n");
     printf("Car ");
